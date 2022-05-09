@@ -5,6 +5,7 @@ import time
 io.setmode(io.BCM)
 
 wheelpin = 18
+io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP) 
 
 # While the script runs
 while True:
