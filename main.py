@@ -13,7 +13,6 @@ with open('./../credentials.cred') as f:
 user = lines[0].split(':')[1].strip()
 password = lines[1].split(':')[1].strip()
 
-print(user, password)
 # Connect to MariaDB Platform
 try:
     conn = mariadb.connect(
