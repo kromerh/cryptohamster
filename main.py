@@ -43,5 +43,5 @@ while True:
         # When the magnet passes the magnet reed switch, one rotation has happened
         if (io.input(wheelpin) == 0):
             print('MAGNET!')
-            cursor.execute(f"INSERT INTO {TABLE} () VALUES ()")
+            cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
             time.sleep(0.01)
