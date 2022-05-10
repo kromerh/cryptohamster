@@ -37,11 +37,15 @@ wheelpin = 18
 io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP) 
 
 # While the script runs
-while True:
-        print('Running...')
-        time.sleep(0.001)
-        # When the magnet passes the magnet reed switch, one rotation has happened
-        if (io.input(wheelpin) == 0):
-            print('MAGNET!')
-            cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
-            time.sleep(0.01)
+try:
+    while True:
+            print('Running...')
+            time.sleep(0.001)
+            # When the magnet passes the magnet reed switch, one rotation has happened
+            if (io.input(wheelpin) == 0):
+                print('MAGNET!')
+                cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
+                conn.commit()
+                time.sleep(0.01)
+except KeyboardInterrupt:
+    conn.close()
