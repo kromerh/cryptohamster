@@ -10,8 +10,8 @@ HOST = 'localhost'
 with open('./../credentials.cred') as f:
     lines = f.readlines()
     f.close()
-user = lines[0].split(':')[1]
-password = lines[1].split(':')[1]
+user = lines[0].split(':')[1].strip()
+password = lines[1].split(':')[1].strip()
 
 print(user, password)
 # Connect to MariaDB Platform
