@@ -10,8 +10,8 @@ io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP)
 # While the script runs
 while True:
         print('Running...')
-        time.sleep(0.1)
+        time.sleep(0.001)
         # When the magnet passes the magnet reed switch, one rotation has happened
         if (io.input(wheelpin) == 0):
             print('MAGNET!')
-            time.sleep(1)
+            time.sleep(0.01)
