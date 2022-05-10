@@ -5,6 +5,7 @@ import sys
 
 DATABASE = 'cryptohamster'
 HOST = 'localhost'
+TABLE = 'hamsterwheel'
 
 # Load credentials to connect to db
 with open('./../credentials.cred') as f:
@@ -42,5 +43,5 @@ while True:
         # When the magnet passes the magnet reed switch, one rotation has happened
         if (io.input(wheelpin) == 0):
             print('MAGNET!')
-            cursor.execute(f"INSERT INTO {DATABASE} () VALUES ()")
+            cursor.execute(f"INSERT INTO {TABLE} () VALUES ()")
             time.sleep(0.01)
