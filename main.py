@@ -13,6 +13,7 @@ with open('./../credentials.cred') as f:
 user = lines[0].split(':')[1]
 password = lines[1].split(':')[1]
 
+print(user, password)
 # Connect to MariaDB Platform
 try:
     conn = mariadb.connect(
@@ -25,7 +26,7 @@ try:
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB Platform: {e}")
     sys.exit(1)
-print(user, password)
+
 # Get Cursor
 cursor = conn.cursor()
 
