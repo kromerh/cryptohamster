@@ -42,8 +42,7 @@ cnt = 0
 print(f'{datetime.now()} - Started script...')
 try:
     while True:
-            if (cnt % 2000) == 0:
-                print(f'{datetime.now()} - Running...')
+            print(f'{datetime.now()} - Running...')
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
@@ -51,6 +50,5 @@ try:
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
-            cnt += 1
 except KeyboardInterrupt:
     conn.close()
