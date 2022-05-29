@@ -46,6 +46,6 @@ try:
                 print('MAGNET!')
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
-                time.sleep(0.1)
+                time.sleep(0.01)
 except KeyboardInterrupt:
     conn.close()
