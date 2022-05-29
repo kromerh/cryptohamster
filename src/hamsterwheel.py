@@ -1,15 +1,15 @@
+from datetime import datetime
 import RPi.GPIO as io
-import time
 import mariadb
 import sys
-from datetime import datetime
+import time
 
 DATABASE = 'cryptohamster'
 HOST = 'localhost'
 TABLE = 'hamsterwheel'
 
 # Load credentials to connect to db
-with open('./../credentials.cred') as f:
+with open('~/credentials.cred') as f:
     lines = f.readlines()
     f.close()
 user = lines[0].split(':')[1].strip()
@@ -25,7 +25,7 @@ try:
         database=DATABASE
     )
 except mariadb.Error as e:
-    sys.stdout.write(f"Error connecting to MariaDB Platform: {e}")
+    print(f"Error connecting to MariaDB Platform: {e}")
     sys.exit(1)
 
 # Get Cursor
@@ -38,14 +38,15 @@ wheelpin = 18
 io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP) 
 
 # While the script runs
-sys.stdout.write(f'{datetime.now()} - Started script...')
+cnt = 0
+print(f'{datetime.now()} - Started script...')
 try:
     while True:
-            sys.stdout.write(f'{datetime.now()} - Running...')
+            print(f'{datetime.now()} - Running...')
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
-                sys.stdout.write('MAGNET!')
+                print(f'{datetime.now()} - MAGNET!')
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
