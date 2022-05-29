@@ -4,12 +4,14 @@ import mariadb
 import sys
 import time
 
+# Database connection strings
 DATABASE = 'cryptohamster'
 HOST = 'localhost'
 TABLE = 'hamsterwheel'
+FULL_PATH_TO_CREDENTIALS = '/home/wilson/credentials.cred'
 
 # Load credentials to connect to db
-with open('~/credentials.cred') as f:
+with open(FULL_PATH_TO_CREDENTIALS) as f:
     lines = f.readlines()
     f.close()
 user = lines[0].split(':')[1].strip()
