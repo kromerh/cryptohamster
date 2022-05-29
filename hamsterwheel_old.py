@@ -25,7 +25,7 @@ try:
         database=DATABASE
     )
 except mariadb.Error as e:
-    print(f"Error connecting to MariaDB Platform: {e}")
+    sys.stdout.write(f"Error connecting to MariaDB Platform: {e}")
     sys.exit(1)
 
 # Get Cursor
@@ -38,16 +38,16 @@ wheelpin = 18
 io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP) 
 
 # While the script runs
-print(f'{datetime.now()} - Started script...')
+sys.stdout.write(f'{datetime.now()} - Started script...')
 cnt = 0
 try:
     while True:
             if (cnt % 1000) == 0:
-                print(f'{datetime.now()} - Running...')
+                sys.stdout.write(f'{datetime.now()} - Running...')
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
-                print('MAGNET!')
+                sys.stdout.write('MAGNET!')
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
