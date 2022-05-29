@@ -1,3 +1,9 @@
+# Credentials
 *.cred
 credentials.cred
 */*.cred
+
+# python environment
+*/env
+env/*
+env/**
