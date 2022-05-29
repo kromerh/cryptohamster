@@ -1,7 +1,8 @@
+from datetime import datetime
 import RPi.GPIO as io
-import time
 import mariadb
 import sys
+import time
 
 DATABASE = 'cryptohamster'
 HOST = 'localhost'
@@ -37,15 +38,18 @@ wheelpin = 18
 io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP) 
 
 # While the script runs
+cnt = 0
 try:
     while True:
-            print('Running...')
+            if (cnt % 2000) == 0:
+                print(f'{datetime.now()} - Running...')
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
-                print('MAGNET!')
+                print(f'{datetime.now()} - MAGNET!')
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
+            cnt += 1
 except KeyboardInterrupt:
     conn.close()
