@@ -39,6 +39,7 @@ io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP)
 
 # While the script runs
 cnt = 0
+print(f'{datetime.now()} - Started script...')
 try:
     while True:
             if (cnt % 2000) == 0:
