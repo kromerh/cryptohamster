@@ -2,6 +2,7 @@ import RPi.GPIO as io
 import time
 import mariadb
 import sys
+from datetime import datetime
 
 DATABASE = 'cryptohamster'
 HOST = 'localhost'
@@ -37,6 +38,7 @@ wheelpin = 18
 io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP) 
 
 # While the script runs
+print(f'{datetime.now()} - Started script...')
 try:
     while True:
             print('Running...')
