@@ -39,11 +39,9 @@ io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP)
 
 # While the script runs
 sys.stdout.write(f'{datetime.now()} - Started script...')
-cnt = 0
 try:
     while True:
-            if (cnt % 1000) == 0:
-                sys.stdout.write(f'{datetime.now()} - Running...')
+            sys.stdout.write(f'{datetime.now()} - Running...')
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
@@ -51,6 +49,5 @@ try:
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
-            cnt += 1
 except KeyboardInterrupt:
     conn.close()
