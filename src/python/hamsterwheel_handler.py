@@ -1,24 +1,16 @@
 import os
 import subprocess
 import time
-from datetime import datetime
 
-# Constants
-HOME = '/home/wilson'
-FILENAME_RUN_HAMSTERWHEEL = 'run_hamsterwheel.sh'
-HAMSTERWHEEL_PATH = f'{HOME}/{FILENAME_RUN_HAMSTERWHEEL}'
+from utils import log
 
-HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
+from constants import (
+    HAMSTERWHEEL_LOG_FILE_PATH,
+    HAMSTERWHEEL_PATH,
+    HANDLER_LOG_FILE_PATH
+)
 
-HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
-
-def log(log_path: str, logmsg: str):
-    with open(log_path, 'a') as f:
-        f.write('\n')
-        f.write(logmsg)
-        f.close()
-
-# Check if the log file is populating
+# Check if the log file is populating for the hamsterwheel script. If it i
 # Get file size, wait two seconds, get the file size again, and a third time
 file_size_1 = os.stat(HAMSTERWHEEL_LOG_FILE_PATH).st_size
 # Wait for 2 seconds
@@ -30,18 +22,13 @@ time.sleep(2)
 # Get new file size
 file_size_3 = os.stat(HAMSTERWHEEL_LOG_FILE_PATH).st_size
 
-print(f"Three file size readings are: [{file_size_1}, {file_size_2}, {file_size_3}]")
-
 # If all three readings have the same file size, the feed is stale
 if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
-    print(f"Running {HAMSTERWHEEL_PATH}...")
     # Add to a logfile that the script was started
-    msg = f'{datetime.now()} - Starting hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
+    msg = f'Starting hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
     log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
     subprocess.call(['sh', HAMSTERWHEEL_PATH])
 
-    
 else:
-    msg = f'{datetime.now()} - Hamsterwheel script was running. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
+    msg = f'Hamsterwheel script was running. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
     log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
-
