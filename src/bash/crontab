@@ -1,0 +1,3 @@
+*/3 * * * * /home/wilson/run_hamsterwheel_handler.sh
+30 * * * * > /home/wilson/log/hamsterwheel.log
+0 13 * * 6 > /home/wilson/log/hamsterwheel_handler.log
