@@ -3,14 +3,12 @@ import subprocess
 import time
 from datetime import datetime
 
-REPO = 'wilsonisahamster'
-FILENAME_HAMSTERWHEEL = 'hamsterwheel.py'
+# Constants
 HOME = '/home/wilson'
-HAMSTERWHEEL_PATH = f'{HOME}/{REPO}/{FILENAME_HAMSTERWHEEL}'
+FILENAME_RUN_HAMSTERWHEEL = 'run_hamsterwheel.sh'
+HAMSTERWHEEL_PATH = f'{HOME}/{FILENAME_RUN_HAMSTERWHEEL}'
 
 HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
-
-ENV_PATH = f'{HOME}/hamsterwheelcaster/bin/python'
 
 HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
 
@@ -28,7 +26,7 @@ file_size_3 = os.stat(HAMSTERWHEEL_LOG_FILE_PATH).st_size
 
 # If all three readings have the same file size, the feed is stale
 if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
-    subprocess.call([ENV_PATH, HAMSTERWHEEL_PATH])
+    subprocess.call(['sh', HAMSTERWHEEL_PATH])
 
 # Add to a logfile that the script was started
 with open(HANDLER_LOG_FILE_PATH, 'a') as f:
