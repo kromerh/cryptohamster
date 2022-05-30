@@ -3,10 +3,10 @@
 # Home directory on the RPi
 HOME = '/home/wilson'
 REPO = 'wilsonisahamster'
-PYTHON = 'src/python'
+BASH = 'src/bash'
 # Location of the .sh file on the RPi (copied from this repo)
 FILENAME_RUN_HAMSTERWHEEL = 'run_hamsterwheel.sh'
-HAMSTERWHEEL_PATH = f'{HOME}/{REPO}/{PYTHON}/{FILENAME_RUN_HAMSTERWHEEL}'
+HAMSTERWHEEL_PATH = f'{HOME}/{REPO}/{BASH}/{FILENAME_RUN_HAMSTERWHEEL}'
 
 # Log files
 # Log file for the hamsterwheel sensor code
