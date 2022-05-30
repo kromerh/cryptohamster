@@ -12,6 +12,12 @@ HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 
 HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
 
+def log(log_path: str, logmsg: str):
+    with open(log_path, 'a') as f:
+        f.write('\n')
+        f.write(logmsg)
+        f.close()
+
 # Check if the log file is populating
 # Get file size, wait two seconds, get the file size again, and a third time
 file_size_1 = os.stat(HAMSTERWHEEL_LOG_FILE_PATH).st_size
@@ -31,8 +37,10 @@ if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
     print(f"Running {HAMSTERWHEEL_PATH}...")
     subprocess.call(['sh', HAMSTERWHEEL_PATH])
 
-# Add to a logfile that the script was started
-with open(HANDLER_LOG_FILE_PATH, 'a') as f:
-    f.write('\n')
-    f.write(f'{datetime.now()} - Started hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]')
-    f.close()
+    # Add to a logfile that the script was started
+    msg = f'{datetime.now()} - Started hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
+    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=log)
+else:
+    msg = f'{datetime.now()} - Hamsterwheel script was running. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
+    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=log)
+
