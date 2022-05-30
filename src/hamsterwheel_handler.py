@@ -24,8 +24,11 @@ time.sleep(2)
 # Get new file size
 file_size_3 = os.stat(HAMSTERWHEEL_LOG_FILE_PATH).st_size
 
+print(f"Three file size readings are: [{file_size_1}, {file_size_2}, {file_size_3}]")
+
 # If all three readings have the same file size, the feed is stale
 if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
+    print(f"Running {HAMSTERWHEEL_PATH}...")
     subprocess.call(['sh', HAMSTERWHEEL_PATH])
 
 # Add to a logfile that the script was started
