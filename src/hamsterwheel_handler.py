@@ -33,6 +33,6 @@ if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
 
 # Add to a logfile that the script was started
 with open(HANDLER_LOG_FILE_PATH, 'a') as f:
-    f.write('/n')
+    f.write('\n')
     f.write(f'{datetime.now()} - Started hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]')
     f.close()
