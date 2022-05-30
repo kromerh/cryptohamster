@@ -35,11 +35,12 @@ print(f"Three file size readings are: [{file_size_1}, {file_size_2}, {file_size_
 # If all three readings have the same file size, the feed is stale
 if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
     print(f"Running {HAMSTERWHEEL_PATH}...")
+    # Add to a logfile that the script was started
+    msg = f'{datetime.now()} - Starting hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
+    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
     subprocess.call(['sh', HAMSTERWHEEL_PATH])
 
-    # Add to a logfile that the script was started
-    msg = f'{datetime.now()} - Started hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
-    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
+    
 else:
     msg = f'{datetime.now()} - Hamsterwheel script was running. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
     log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
