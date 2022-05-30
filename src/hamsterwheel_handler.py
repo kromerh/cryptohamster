@@ -39,8 +39,8 @@ if (file_size_1 == file_size_2) & (file_size_1 == file_size_3):
 
     # Add to a logfile that the script was started
     msg = f'{datetime.now()} - Started hamsterwheel script. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
-    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=log)
+    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
 else:
     msg = f'{datetime.now()} - Hamsterwheel script was running. Logfile sizes: [{file_size_1}, {file_size_2}, {file_size_3}]'
-    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=log)
+    log(log_path=HANDLER_LOG_FILE_PATH, logmsg=msg)
 
