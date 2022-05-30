@@ -15,6 +15,9 @@ def log(log_path: str, logmsg: str, printout: bool = False) -> None:
     # Add the current timestamp to the log
     logmsg = f'{datetime.now()} - {logmsg}'
 
+    if printout:
+        print(logmsg)
+
     with open(log_path, 'a') as f:
         f.write('\n')
         f.write(logmsg)

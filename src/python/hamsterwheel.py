@@ -17,19 +17,7 @@ from constants import (
     TABLE_HAMSTERWHEEL,
 )
 
-
-def log(log_path: str, logmsg: str):
-    with open(log_path, 'a') as f:
-        f.write('\n')
-        f.write(logmsg)
-        f.close()
-
-# Load credentials to connect to db
-with open(FULL_PATH_TO_CREDENTIALS) as f:
-    lines = f.readlines()
-    f.close()
-user = lines[0].split(':')[1].strip()
-password = lines[1].split(':')[1].strip()
+user, password = load_credentials(filepath=FULL_PATH_TO_CREDENTIALS)
 
 # Connect to MariaDB Platform
 try:
