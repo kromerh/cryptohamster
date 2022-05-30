@@ -1,18 +1,22 @@
-from datetime import datetime
 import RPi.GPIO as io
 import mariadb
 import sys
 import time
 
-# Database connection strings
-DATABASE = 'cryptohamster'
-HOST = 'localhost'
-TABLE = 'hamsterwheel'
-FULL_PATH_TO_CREDENTIALS = '/home/wilson/credentials.cred'
+from utils import (
+    load_credentials,
+    log,
+)
 
-# Constants for the log file
-HOME = '/home/wilson'
-HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
+from constants import (
+    DATABASE,
+    FULL_PATH_TO_CREDENTIALS,
+    HAMSTERWHEEL_LOG_FILE_PATH,
+    HOST_LOCAL,
+    PORT,
+    TABLE_HAMSTERWHEEL,
+)
+
 
 def log(log_path: str, logmsg: str):
     with open(log_path, 'a') as f:
@@ -32,14 +36,13 @@ try:
     conn = mariadb.connect(
         user=user,
         password=password,
-        host=HOST,
-        port=3306,
+        host=HOST_LOCAL,
+        port=PORT,
         database=DATABASE
     )
 except mariadb.Error as e:
-    msg = f"{datetime.now()} - Error connecting to MariaDB Platform: {e}"
-    print(msg)
-    log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
+    msg = f"Error connecting to MariaDB Platform: {e}"
+    log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
     sys.exit(1)
 
 # Get Cursor
@@ -53,20 +56,18 @@ io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP)
 
 # While the script runs
 cnt = 0
-msg = f'{datetime.now()} - Started script...'
-log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
+msg = 'Started script...'
+log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
 try:
     while True:
-            msg = f'{datetime.now()} - Running...'
-            print(msg)
-            log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
+            msg = 'Running...'
+            log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
-                msg = f'{datetime.now()} - MAGNET!'
-                print(msg)
-                log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
-                cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
+                msg = 'MAGNET!'
+                log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
+                cursor.execute(f"INSERT INTO {TABLE_HAMSTERWHEEL} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
 except KeyboardInterrupt:
