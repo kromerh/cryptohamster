@@ -62,7 +62,7 @@ try:
     while True:
             msg = 'Running...'
             log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
-            time.sleep(0.001)
+            time.sleep(0.01)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
                 msg = 'MAGNET!'
