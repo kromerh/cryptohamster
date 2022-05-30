@@ -10,6 +10,16 @@ HOST = 'localhost'
 TABLE = 'hamsterwheel'
 FULL_PATH_TO_CREDENTIALS = '/home/wilson/credentials.cred'
 
+# Constants for the log file
+HOME = '/home/wilson'
+HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
+
+def log(log_path: str, logmsg: str):
+    with open(log_path) as f:
+        f.write('\n')
+        f.write(logmsg)
+        f.close()
+
 # Load credentials to connect to db
 with open(FULL_PATH_TO_CREDENTIALS) as f:
     lines = f.readlines()
@@ -27,7 +37,9 @@ try:
         database=DATABASE
     )
 except mariadb.Error as e:
-    print(f"Error connecting to MariaDB Platform: {e}")
+    msg = f"{datetime.now()} - Error connecting to MariaDB Platform: {e}"
+    print(msg)
+    log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
     sys.exit(1)
 
 # Get Cursor
@@ -41,14 +53,19 @@ io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP)
 
 # While the script runs
 cnt = 0
-print(f'{datetime.now()} - Started script...')
+msg = f'{datetime.now()} - Started script...'
+log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
 try:
     while True:
-            print(f'{datetime.now()} - Running...')
+            msg = f'{datetime.now()} - Running...'
+            print(msg)
+            log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
             time.sleep(0.001)
             # When the magnet passes the magnet reed switch, one rotation has happened
             if (io.input(wheelpin) == 0):
-                print(f'{datetime.now()} - MAGNET!')
+                msg = f'{datetime.now()} - MAGNET!'
+                print(msg)
+                log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg)
                 cursor.execute(f"INSERT INTO {TABLE} (flag) VALUES (True)")
                 conn.commit()
                 time.sleep(0.01)
