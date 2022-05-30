@@ -15,7 +15,7 @@ HOME = '/home/wilson'
 HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 
 def log(log_path: str, logmsg: str):
-    with open(log_path) as f:
+    with open(log_path, 'a') as f:
         f.write('\n')
         f.write(logmsg)
         f.close()
