@@ -57,6 +57,5 @@ try:
                 log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
                 cursor.execute(f"INSERT INTO {TABLE_HAMSTERWHEEL} (flag) VALUES (True)")
                 conn.commit()
-                time.sleep(0.01)
 except KeyboardInterrupt:
     conn.close()

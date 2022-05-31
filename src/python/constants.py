@@ -19,7 +19,7 @@ HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
 # Database connection strings
 DATABASE = 'cryptohamster'
 HOST_LOCAL = 'localhost'  # On the RPi local
-HOST_REMOTE = 'wilsonisahamster'  # Sometimes does not work: then use 192.168.1.105
+HOST_REMOTE = '192.168.1.105'  # Sometimes does not work: then use 192.168.1.105
 PORT = 3306
 FULL_PATH_TO_CREDENTIALS = f'{HOME}/credentials.cred'
 
