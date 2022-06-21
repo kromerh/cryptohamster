@@ -9,10 +9,13 @@ FILENAME_RUN_HAMSTERWHEEL = 'run_hamsterwheel.sh'
 HAMSTERWHEEL_PATH = f'{HOME}/{REPO}/{BASH}/{FILENAME_RUN_HAMSTERWHEEL}'
 
 # Log files
+PRINTOUT = True
 # Log file for the hamsterwheel sensor code
 HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 # Log file for the handler script script
 HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
+# Log file for the decision class
+DECISION_LOG_FILE_PATH = f'{HOME}/log/decision.log'
 
 # Database
 

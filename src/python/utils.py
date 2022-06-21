@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Tuple
 
+
 def log(log_path: str, logmsg: str, printout: bool = False) -> None:
     """Function to add a line to a logfile.
 
