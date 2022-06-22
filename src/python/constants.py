@@ -28,3 +28,21 @@ FULL_PATH_TO_CREDENTIALS = f'{HOME}/credentials.cred'
 
 # Table for the wheel data
 TABLE_HAMSTERWHEEL = 'hamsterwheel'
+DB_TBL = {
+    'WALLET': {
+        'name': 'wallet',
+        'id_col': 'wallet_id'
+    },
+    'DECISION': {
+        'name': 'decision',
+        'id_col': 'decision_id'
+    },
+    'HAMSTERHWEEL': {
+        'name': 'hamsterhweel',
+        'id_col': 'hamsterhweel_id'
+    },
+    'DECISION': {
+        'name': 'decision',
+        'id_col': 'decision_id'
+    },
+}

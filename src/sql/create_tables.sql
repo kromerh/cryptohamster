@@ -1,0 +1,46 @@
+CREATE TABLE hamsterwheel(
+    hamsterwheel_id INT NOT NULL AUTO_INCREMENT,
+    time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    flag TINYINT(1) NOT NULL,
+    PRIMARY KEY ( hamsterwheel_id )
+);
+
+CREATE TABLE session(
+    session_id INT NOT NULL AUTO_INCREMENT,
+    start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    end_time TIMESTAMP(6),
+    end_type VARCHAR(50),
+    PRIMARY KEY ( session_id )
+);
+
+CREATE TABLE wallet(
+    wallet_id INT NOT NULL AUTO_INCREMENT,
+    currency_symbol VARCHAR(50) NOT NULL,
+    amount FLOAT NOT NULL,
+    PRIMARY KEY ( wallet_id )
+);
+
+CREATE TABLE tradebook(
+    tradebook_id INT NOT NULL AUTO_INCREMENT,
+    session_id INT,
+    direction VARCHAR(50) NOT NULL,
+    currency_symbol VARCHAR(50) NOT NULL,
+    amount FLOAT NOT NULL,
+    time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY ( tradebook_id ),
+    FOREIGN KEY ( session_id ) REFERENCES session( session_id )
+);
+
+CREATE TABLE decision(
+    decision_id INT NOT NULL AUTO_INCREMENT,
+    session_id INT,
+    type VARCHAR(50) NOT NULL,
+    result VARCHAR(50) NOT NULL,
+    start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    end_time TIMESTAMP(6),
+    hamsterwheel_id_start INT,
+    hamsterwheel_id_end INT,
+    PRIMARY KEY ( decision_id ),
+    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES session( hamsterwheel_id ),
+    FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES session( hamsterwheel_id ),
+);

@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Tuple
+import pandas as pd
+import pymysql
 
 
 def log(log_path: str, logmsg: str, printout: bool = False) -> None:
@@ -41,3 +43,29 @@ def load_credentials(filepath: str) -> Tuple[str, str]:
     password = lines[1].split(':')[1].strip()
 
     return (user, password)
+
+
+def get_latest_row_by_id(
+    mysql_connection: pymysql.connections.Connection,
+    table: str,
+    id_col: str
+    ) -> pd.core.series.Series:
+    """Function to get the latest row of a table by id.
+
+    The table is ordered descending by the `id_col` the last row is returned.
+
+    Args:
+        mysql_connection: MySQL connection
+        table: Table name.
+        id_col: ID column. 
+    """
+    qry = f'SELECT * FROM {table} ORDER BY {id_col} DESC LIMIT 1'
+    df = pd.read_sql(
+        sql=qry,
+        con=mysql_connection,
+        index_col=id_col
+    )
+    df = df.iloc[-1, :]
+
+    return df
+

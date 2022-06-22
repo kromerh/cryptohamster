@@ -9,6 +9,7 @@ from utils import log
 
 from constants import (
     DECISION_LOG_FILE_PATH,
+    DB_TBL,
     PRINTOUT,
 )
 
@@ -24,11 +25,7 @@ AMOUNT = np.arange(1, 101)
 
 # MySQL tables
 # Wallet: Contains what cryptocurrencices the hamster holds in its wallet
-DB_TBL = {
-    'WALLET': 'wallet',
-    'DECISION': 'decisions',
-    'HAMSTERWHEEL': 'hamsterwheel',
-}
+
 WALLET = 'wallet'
 
 # Threshold in seconds between the latest reading of the wheel and the current time
@@ -143,6 +140,15 @@ class Decision():
 
         if time_diff > THRESHOLD_DECISION:
             # Decision is reached
+            # Get the id
+            self._wheel_id = df['hamsterwheel_id'].iloc[-1]
+            # Add to the log
+            logmsg = f'Decision reached, time difference was {time_diff} seconds. Hamsterwheel id is {wheel_id}'
+            log(
+                log_path=DECISION_LOG_FILE_PATH,
+                logmsg=logmsg,
+                printout=PRINTOUT
+            )
             return True
         
         return False
