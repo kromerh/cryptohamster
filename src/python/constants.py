@@ -36,7 +36,10 @@ DB_TBL = {
     },
     'DECISION': {
         'name': 'decision',
-        'id_col': 'decision_id'
+        'id_col': 'decision_id',
+        'end_time_col': 'end_time',
+        'hamsterwheel_id_end_col': 'hamsterwheel_id_end',
+        'result_col': 'result'
     },
     'HAMSTERHWEEL': {
         'name': 'hamsterhweel',

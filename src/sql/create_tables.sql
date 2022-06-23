@@ -33,7 +33,7 @@ CREATE TABLE tradebook(
     FOREIGN KEY ( session_id ) REFERENCES session( session_id )
 );
 
-CREATE TABLE decision_tmp(
+CREATE TABLE decision(
     decision_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
     type VARCHAR(50) NOT NULL,
@@ -46,3 +46,11 @@ CREATE TABLE decision_tmp(
     FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id ),
     FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
+
+INSERT INTO decision (session_id, type, hamsterwheel_id_start) VALUES (1, 'test', 5);
+
+UPDATE decision SET type = 'test2' WHERE session_id = 1;
+UPDATE decision SET end_time = "2022-06-24 00:09:51.123456" WHERE decision_id = 1;
+
+TRUNCATE TABLE decision;
+DROP TABLE decision;

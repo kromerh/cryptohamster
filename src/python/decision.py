@@ -157,18 +157,40 @@ class Decision():
 
     def update_decision_closed(
         self,
-        latest_hamsterwheel: pd.core.series.Series,
-        latest_wheel_id: int
+        latest_decision:  pd.core.series.Series,
+        latest_wheel_id: int,
+        result: str
         ) -> None:
         """Method to update the decision after decision was reached
 
         Args:
-            latest_hamsterwheel: Series with the latest row in the hamsterwheel table.
+            latest_decision: Latest decision row.
             latest_wheel_id: ID of the latest hamsterwheel, i.e., when the wheel last passed the sensor.
+            result: Result of the decision.
         
         Returns:
             None.
         """
+        table = self._db_tbl['DECISION']['name']
+        end_time_col = self._db_tbl['DECISION']['end_time_col']
+        id_col = self._db_tbl['DECISION']['id_col']
+        hamsterwheel_id_end_col = self._db_tbl['DECISION']['hamsterwheel_id_end_col']
+        result_col = self._db_tbl['DECISION']['result_col']
+
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        qry = f'UPDATE {table} ' +\
+              f'SET ' +\
+              f'{end_time_col} = \"{now}\" ' +\
+              f'{hamsterwheel_id_end_col} = {latest_wheel_id} ' +\
+              f'{result_col} = {result} ' +\
+              f'WHERE {id_col} = {latest_decision.name}'
+        try:
+            cursor = self._mysql_connection.cursor()
+            cursor.execute(qry)
+        except Exception as e:
+            print("Exeception occured:{}".format(e))
+        finally:
+            self._mysql_connection.commit()   
 
 
     @classmethod
