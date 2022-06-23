@@ -6,6 +6,7 @@ import time
 from utils import (
     load_credentials,
     log,
+    is_magnet_closed
 )
 
 from constants import (
@@ -55,7 +56,12 @@ try:
             if (io.input(wheelpin) == 0):
                 msg = 'MAGNET!'
                 log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
-                cursor.execute(f"INSERT INTO {TABLE_HAMSTERWHEEL} (flag) VALUES (True)")
-                conn.commit()
+                # If the wheel is stuck in magnet closed position, do not put in database
+                if is_magnet_closed(conn, threshold=0.5):
+                    msg = 'Hamsterwheel stuck in closed position, no insert into DB.'
+                    log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
+                else:
+                    cursor.execute(f"INSERT INTO {TABLE_HAMSTERWHEEL} (flag) VALUES (True)")
+                    conn.commit()
 except KeyboardInterrupt:
     conn.close()
