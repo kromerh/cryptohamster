@@ -3,6 +3,7 @@ from typing import Tuple
 import pandas as pd
 import pymysql
 
+from constants import DB_TBL
 
 def log(log_path: str, logmsg: str, printout: bool = False) -> None:
     """Function to add a line to a logfile.
@@ -43,6 +44,38 @@ def load_credentials(filepath: str) -> Tuple[str, str]:
     password = lines[1].split(':')[1].strip()
 
     return (user, password)
+
+
+def is_magnet_closed(
+    mysql_connection: pymysql.connections.Connection,
+    threshold: float = 0.5
+    ) -> bool:
+    """Function that returns True if the magnet is stuck in closed position.
+
+    When the wheel stops just when the magnet touches the sensor, there would be 
+    infinite readings into the database, we want to avoid this!
+
+    Args:
+        mysql_connection: MySQL connection
+        threshold: Threshold in seconds above which the average must lie.
+
+    Returns:
+        True if average of the last 20 readings is smaller than 0.5 seconds, else False.
+    """
+    # Get the past 20 readings of the hamsterwheel
+    query = f"SELECT * FROM {DB_TBL['HAMSTERWHEEL']['name']} ORDER BY time DESC LIMIT 20"
+    df = pd.read_sql(
+        sql=query,
+        con=mysql_connection,
+        index_col='hamsterwheel_id'
+    )
+    # Compute average
+    avg_time_diff = (df['time'].shift(1) - df['time']).dt.total_seconds().values[1:].mean()
+    # Check if average below threshold
+    if avg_time_diff < threshold:
+        return True
+    else:
+        return False
 
 
 def get_latest_row_by_id(
