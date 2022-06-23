@@ -2,7 +2,7 @@
 
 # Home directory on the RPi
 HOME = '/home/wilson'
-REPO = 'wilsonisahamster'
+REPO = 'cryptohamster'
 BASH = 'src/bash'
 # Location of the .sh file on the RPi (copied from this repo)
 FILENAME_RUN_HAMSTERWHEEL = 'run_hamsterwheel.sh'
