@@ -27,6 +27,7 @@ PORT = 3306
 FULL_PATH_TO_CREDENTIALS = f'{HOME}/credentials.cred'
 
 # Table for the wheel data
+NO_END_TIME = '0000-00-00 00:00:00.000000'
 TABLE_HAMSTERWHEEL = 'hamsterwheel'
 DB_TBL = {
     'WALLET': {

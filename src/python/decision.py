@@ -1,16 +1,19 @@
-from ast import Assert
 from datetime import datetime
-from xmlrpc.client import Boolean
 import numpy as np
 import pymysql
 import pandas as pd
 from typing import Dict, Union
-from utils import log
+
+from utils import (
+    get_latest_row_by_id,
+    log,
+)
 
 from constants import (
     DECISION_LOG_FILE_PATH,
     DB_TBL,
     PRINTOUT,
+    NO_END_TIME,
 )
 
 # Which types of decisions
@@ -68,6 +71,106 @@ class Decision():
         self._wallet = self.get_wallet()
     
 
+    def get_latest_decision(self) -> pd.core.series.Series:
+        """Method to get the latest entry in the decision table. 
+
+        Returns:
+            Series with the latest decision.
+        """
+        table = self._db_tbl['DECISION']['table']
+        id_col = self._db_tbl['DECISION']['id_col']
+
+        s = get_latest_row_by_id(
+            mysql_connection=self._mysql_connection,
+            table=table,
+            id_col=id_col
+        )
+
+        return s
+
+
+    def get_latest_hamsterwheel(self) -> pd.core.series.Series:
+        """Method to get the latest entry in the hamsterwheel table. 
+
+        Returns:
+            Series with the latest hamsterwheel table.
+        """
+        table = self._db_tbl['HAMSTERWHEEL']['table']
+        id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
+
+        s = get_latest_row_by_id(
+            mysql_connection=self._mysql_connection,
+            table=table,
+            id_col=id_col
+        )
+
+        return s
+    
+
+    def is_decision_open(self, latest_decision: pd.core.series.Series) -> bool:
+        """Method to determine if a decision is open.
+
+        Returns:
+            True if there is a running decision, False otherwise.
+        """
+        if latest_decision['end_time'] == NO_END_TIME:
+            return False
+        else:
+            return True
+
+
+    def is_decision_reached(
+        self,
+        latest_hamsterwheel: pd.core.series.Series,
+        threshold: int
+        ) -> Union[None, int]:
+        """Method to check if a decision was reached.
+
+        If the wheel is not turning for more than THRESHOLD_DECISION seconds, a decision is reached. 
+
+        Args:
+            latest_hamsterwheel: Series with the latest hamsterwheel from the database.
+            threshold: Time in seconds after which the decision is considered reached.
+
+        Returns:
+            True if decision is reached, False otherwise.
+        """
+        # Time difference between last reading and now
+        time_diff = (datetime.now() - latest_hamsterwheel['time']).total_seconds()
+
+        if time_diff > threshold:
+            # Decision is reached
+            # Get the id
+            latest_wheel_id = latest_hamsterwheel['hamsterwheel_id']
+            # Add to the log
+            logmsg = f'Decision reached, time difference was {time_diff} seconds. Hamsterwheel id is {latest_wheel_id}'
+            log(
+                log_path=DECISION_LOG_FILE_PATH,
+                logmsg=logmsg,
+                printout=PRINTOUT
+            )
+            # Update the closing decision 
+            return True
+        
+        return False
+
+
+    def update_decision_closed(
+        self,
+        latest_hamsterwheel: pd.core.series.Series,
+        latest_wheel_id: int
+        ) -> None:
+        """Method to update the decision after decision was reached
+
+        Args:
+            latest_hamsterwheel: Series with the latest row in the hamsterwheel table.
+            latest_wheel_id: ID of the latest hamsterwheel, i.e., when the wheel last passed the sensor.
+        
+        Returns:
+            None.
+        """
+
+
     @classmethod
     def _validate_mysql_kwargs(self, mysql_kwargs: Dict[str, str]) -> Union[Dict[str, str], None]:
         """Method to validate the MySQL keyword arguments.
@@ -117,41 +220,7 @@ class Decision():
         return df
 
 
-    def check_decision_status(self) -> bool:
-        """Method to check if a decision was reached.
-
-        If the wheel is not turning for more than THRESHOLD_DECISION seconds, a decision is reached. 
-
-        Returns:
-            True if decision is reached, False otherwise
-        """
-        # Check every second if the time between the latest entry in the database is longer than THRESHOLD_DECISION
-        # If it is larger, then a decision is reached
-        hamsterwheel_table = self._db_tbl['HAMSTERWHEEL']
-        qry = f'SELECT * FROM {hamsterwheel_table} ORDER BY time DESC LIMIT 1'
-        df = pd.read_sql(
-            sql=qry,
-            con=self._mysql_connection,
-            index_col='hamsterwheel_id'
-        )
-
-        # Time difference between last reading and now
-        time_diff = (datetime.now() - df['time'].iloc[-1] ).total_seconds()
-
-        if time_diff > THRESHOLD_DECISION:
-            # Decision is reached
-            # Get the id
-            self._wheel_id = df['hamsterwheel_id'].iloc[-1]
-            # Add to the log
-            logmsg = f'Decision reached, time difference was {time_diff} seconds. Hamsterwheel id is {wheel_id}'
-            log(
-                log_path=DECISION_LOG_FILE_PATH,
-                logmsg=logmsg,
-                printout=PRINTOUT
-            )
-            return True
-        
-        return False
+    
 
 
     def get_decision_number(self):

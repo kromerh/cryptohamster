@@ -5,6 +5,7 @@ from constants import (
     DECISION_LOG_FILE_PATH,
     DB_TBL,
     PRINTOUT,
+    NO_END_TIME,
 )
 from utils import get_latest_row_by_id
 
@@ -30,9 +31,10 @@ class Session():
         """
         # Database tables
         self._db_tbl = DB_TBL
+        self._mysql_connection = mysql_connection
         
     
-    def get_latest_session(self) -> pd.Session:
+    def get_latest_session(self) -> pd.core.series.Series:
         """Method to get the latest entry in the session table. 
 
         Returns:
@@ -40,9 +42,14 @@ class Session():
         """
         table = self._db_tbl['SESSION']['table']
         id_col = self._db_tbl['SESSION']['id_col']
-        df = get_latest_row_by_id(table=table, id_col=id_col)
 
-        return df
+        s = get_latest_row_by_id(
+            mysql_connection=self._mysql_connection,
+            table=table,
+            id_col=id_col
+        )
+
+        return s
     
 
     def is_session_open(self, latest_session: pd.core.series.Series) -> bool:
@@ -51,8 +58,7 @@ class Session():
         Returns:
             True if there is a running session, False otherwise.
         """
-        if latest_session['end_time'] == None:
-            pass
-        
-        
-
+        if latest_session['end_time'] == NO_END_TIME:
+            return False
+        else:
+            return True

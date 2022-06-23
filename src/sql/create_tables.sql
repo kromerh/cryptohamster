@@ -7,10 +7,12 @@ CREATE TABLE hamsterwheel(
 
 CREATE TABLE session(
     session_id INT NOT NULL AUTO_INCREMENT,
+    start_hamsterwheel_id INT,
     start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     end_time TIMESTAMP(6),
     end_type VARCHAR(50),
-    PRIMARY KEY ( session_id )
+    PRIMARY KEY ( session_id ),
+    FOREIGN KEY ( start_hamsterwheel_id ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
 
 CREATE TABLE wallet(
@@ -31,16 +33,16 @@ CREATE TABLE tradebook(
     FOREIGN KEY ( session_id ) REFERENCES session( session_id )
 );
 
-CREATE TABLE decision(
+CREATE TABLE decision_tmp(
     decision_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
     type VARCHAR(50) NOT NULL,
-    result VARCHAR(50) NOT NULL,
+    result VARCHAR(50),
     start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     end_time TIMESTAMP(6),
-    hamsterwheel_id_start INT,
+    hamsterwheel_id_start INT NOT NULL,
     hamsterwheel_id_end INT,
     PRIMARY KEY ( decision_id ),
-    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES session( hamsterwheel_id ),
-    FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES session( hamsterwheel_id ),
+    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id ),
+    FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
