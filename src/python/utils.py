@@ -48,7 +48,7 @@ def load_credentials(filepath: str) -> Tuple[str, str]:
 
 def is_magnet_closed(
     mysql_connection: pymysql.connections.Connection,
-    threshold: float = 0.5
+    threshold: float = 0.75
     ) -> bool:
     """Function that returns True if the magnet is stuck in closed position.
 
@@ -60,7 +60,7 @@ def is_magnet_closed(
         threshold: Threshold in seconds above which the average must lie.
 
     Returns:
-        True if average of the last 20 readings is smaller than 0.5 seconds, else False.
+        True if average of the last 20 readings is smaller than 0.75 seconds, else False.
     """
     # Get the past 20 readings of the hamsterwheel
     query = f"SELECT * FROM {DB_TBL['HAMSTERWHEEL']['name']} ORDER BY time DESC LIMIT 20"
