@@ -41,9 +41,9 @@ DB_TBL = {
         'hamsterwheel_id_end_col': 'hamsterwheel_id_end',
         'result_col': 'result'
     },
-    'HAMSTERHWEEL': {
-        'name': 'hamsterhweel',
-        'id_col': 'hamsterhweel_id'
+    'HAMSTERWHEEL': {
+        'name': 'hamsterwheel',
+        'id_col': 'hamsterwheel_id'
     },
     'DECISION': {
         'name': 'decision',
