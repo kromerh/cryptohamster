@@ -57,7 +57,7 @@ try:
                 msg = 'MAGNET!'
                 log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
                 # If the wheel is stuck in magnet closed position, do not put in database
-                if is_magnet_closed(conn, threshold=0.5):
+                if is_magnet_closed(conn, threshold=0.725):
                     msg = 'Hamsterwheel stuck in closed position, no insert into DB.'
                     log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
                 else:

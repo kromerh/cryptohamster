@@ -48,7 +48,7 @@ def load_credentials(filepath: str) -> Tuple[str, str]:
 
 def is_magnet_closed(
     mysql_connection: pymysql.connections.Connection,
-    threshold: float = 0.75
+    threshold: float = 0.725
     ) -> bool:
     """Function that returns True if the magnet is stuck in closed position.
 
