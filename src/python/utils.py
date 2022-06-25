@@ -3,7 +3,6 @@ from typing import Tuple
 import pandas as pd
 import pymysql
 
-from constants import DB_TBL
 
 def log(log_path: str, logmsg: str, printout: bool = False) -> None:
     """Function to add a line to a logfile.

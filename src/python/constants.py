@@ -1,3 +1,5 @@
+import numpy as np
+
 # RPi paths
 
 # Home directory on the RPi
@@ -37,9 +39,14 @@ DB_TBL = {
     'DECISION': {
         'name': 'decision',
         'id_col': 'decision_id',
+        'session_id_col': 'session_id',
+        'start_time_col': 'start_time',
         'end_time_col': 'end_time',
+        'hamsterwheel_id_start_col': 'hamsterwheel_id_start',
         'hamsterwheel_id_end_col': 'hamsterwheel_id_end',
-        'result_col': 'result'
+        'result_col': 'result',
+        'type_col': 'type',
+        'wheel_turns_col': 'wheel_turns',
     },
     'HAMSTERWHEEL': {
         'name': 'hamsterwheel',
@@ -49,4 +56,15 @@ DB_TBL = {
         'name': 'decision',
         'id_col': 'decision_id'
     },
+}
+
+# Decisions
+BUY_SELL = 'buy_sell'
+CURRENCY = 'currency'
+AMOUNT = 'amount'
+
+DECISION_OPTIONS = {
+    BUY_SELL: ['BUY', 'SELL'],
+    CURRENCY: [],  # is queried from the database
+    AMOUNT: list(np.arange(1, 101))  # 1 to 100 %
 }

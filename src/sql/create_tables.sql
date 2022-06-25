@@ -42,6 +42,7 @@ CREATE TABLE decision(
     end_time TIMESTAMP(6),
     hamsterwheel_id_start INT NOT NULL,
     hamsterwheel_id_end INT,
+    wheel_turns INT,
     PRIMARY KEY ( decision_id ),
     FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id ),
     FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES hamsterwheel( hamsterwheel_id )
