@@ -7,7 +7,7 @@ CREATE TABLE hamsterwheel(
 
 CREATE TABLE session(
     session_id INT NOT NULL AUTO_INCREMENT,
-    start_hamsterwheel_id INT,
+    hamsterwheel_id_start INT NOT NULL,
     start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     end_time TIMESTAMP(6),
     end_type VARCHAR(50),

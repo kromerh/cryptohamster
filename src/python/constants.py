@@ -17,7 +17,7 @@ HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 # Log file for the handler script script
 HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
 # Log file for the decision class
-DECISION_LOG_FILE_PATH = f'{HOME}/log/decision.log'
+CRYPTOHAMSTER_LOG_FILE_PATH = f'{HOME}/log/cryptohamster.log'
 
 # Database
 
@@ -50,11 +50,16 @@ DB_TBL = {
     },
     'HAMSTERWHEEL': {
         'name': 'hamsterwheel',
-        'id_col': 'hamsterwheel_id'
+        'id_col': 'hamsterwheel_id',
+        'time_col': 'time',
     },
-    'DECISION': {
-        'name': 'decision',
-        'id_col': 'decision_id'
+    'SESSION': {
+        'name': 'session',
+        'id_col': 'session_id',
+        'start_time_col': 'start_time',
+        'end_time_col': 'end_time',
+        'end_type_col': 'end_type',
+        'hamsterwheel_id_start_col': 'hamsterwheel_id_start',
     },
 }
 
@@ -62,9 +67,16 @@ DB_TBL = {
 BUY_SELL = 'buy_sell'
 CURRENCY = 'currency'
 AMOUNT = 'amount'
+TIMEOUT = 'timeout'
+THRESHOLD_DECISION_TIMEOUT = 120
 
 DECISION_OPTIONS = {
     BUY_SELL: ['BUY', 'SELL'],
     CURRENCY: [],  # is queried from the database
     AMOUNT: list(np.arange(1, 101))  # 1 to 100 %
 }
+
+# Session
+# Session can end either with a BUY or SELL or TIMEOUT
+SESSION_END_TYPES = ['BUY', 'SELL', 'TIMEOUT']
+THRESHOLD_SESSION_TIMEOUT = 3600

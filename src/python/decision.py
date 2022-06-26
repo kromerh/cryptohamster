@@ -11,7 +11,7 @@ from utils import (
 )
 
 from constants import (
-    DECISION_LOG_FILE_PATH,
+    CRYPTOHAMSTER_LOG_FILE_PATH,
     DB_TBL,
     PRINTOUT,
     NO_END_TIME,
@@ -19,6 +19,8 @@ from constants import (
     BUY_SELL,
     CURRENCY,
     AMOUNT,
+    TIMEOUT,
+    THRESHOLD_DECISION_TIMEOUT
 )
 
 # MySQL tables
@@ -108,7 +110,8 @@ class Decision():
         Returns:
             True if there is a running decision, False otherwise.
         """
-        if latest_decision['end_time'] == NO_END_TIME:
+        end_time_col = self._db_tbl['DECISION']['end_time_col']
+        if latest_decision[end_time_col] == NO_END_TIME:
             return False
         else:
             return True
@@ -117,7 +120,7 @@ class Decision():
     def is_decision_reached(
         self,
         latest_hamsterwheel: pd.core.series.Series,
-        threshold: int
+        threshold: int = THRESHOLD_DECISION
         ) -> Union[None, int]:
         """Method to check if a decision was reached.
 
@@ -130,17 +133,19 @@ class Decision():
         Returns:
             True if decision is reached, False otherwise.
         """
+        time_col = self._db_tbl['HAMSTERWHEEL']['time_col']
+        id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
         # Time difference between last reading and now
-        time_diff = (datetime.now() - latest_hamsterwheel['time']).total_seconds()
+        time_diff = (datetime.now() - latest_hamsterwheel[time_col]).total_seconds()
 
         if time_diff > threshold:
             # Decision is reached
             # Get the id
-            latest_wheel_id = latest_hamsterwheel['hamsterwheel_id']
+            latest_wheel_id = latest_hamsterwheel[id_col]
             # Add to the log
             logmsg = f'Decision reached, time difference was {time_diff} seconds. Hamsterwheel id is {latest_wheel_id}'
             log(
-                log_path=DECISION_LOG_FILE_PATH,
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
@@ -167,13 +172,16 @@ class Decision():
         Returns:
             Number of wheel turns.
         """
-        # Get the latest hamsterwheel ids
-        begin_wheel_id = latest_decision['hamsterwheel_id_start']
-        end_wheel_id = latest_hamsterwheel['hamsterwheel_id']
-
-        # Retrieve the hamsterwheel data for these ids
         table = self._db_tbl['HAMSTERWHEEL']['name']
         id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
+        decision_hamsterwheel_id_start = self._db_tbl['DECISION']['hamsterwheel_id_start_col']
+        hamsterhweel_time_col = self._db_tbl['HAMSTERWHEEL']['time_col']
+
+        # Get the latest hamsterwheel ids
+        begin_wheel_id = latest_decision[decision_hamsterwheel_id_start]
+        end_wheel_id = latest_hamsterwheel[id_col]
+
+        # Retrieve the hamsterwheel data for these ids        
         qry = f'SELECT * FROM {table} ' +\
             f'WHERE {id_col} BETWEEN {begin_wheel_id} and {end_wheel_id}'
         
@@ -185,7 +193,7 @@ class Decision():
         # Remove entries from the dataset that are very short apart
         # The hamster cannot run that fast, see EDA notebook. These readings come from the sensor readout being
         # faster than the magnet can pass the sensor.
-        wheel_data['diff'] = (wheel_data['time'].shift(1) - wheel_data['time']).dt.total_seconds()
+        wheel_data['diff'] = (wheel_data[hamsterhweel_time_col].shift(1) - wheel_data[hamsterhweel_time_col]).dt.total_seconds()
         # Get a True/False series using the threshold
         mask_deadtime = wheel_data['diff'] > threshold_deadtime
         num_wheelturns = mask_deadtime.sum()
@@ -207,8 +215,9 @@ class Decision():
         Returns:
             Decision outcome.
         """
+        type_col = self._db_tbl['DECISION']['type_col']
         # Get the current decision
-        current_decision = latest_decision['type']
+        current_decision = latest_decision[type_col]
 
         # Lookup the list of possible decision from the dictionary
         decision_list = self._decision_options[current_decision]
@@ -225,7 +234,7 @@ class Decision():
         
         logmsg = f'Decision determined: ' + result
         log(
-            log_path=DECISION_LOG_FILE_PATH,
+            log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
             logmsg=logmsg,
             printout=PRINTOUT
         )
@@ -237,8 +246,8 @@ class Decision():
         self,
         latest_decision: pd.core.series.Series,
         latest_hamsterwheel: pd.core.series.Series,
-        wheel_turns: int,
-        result: str
+        wheel_turns: Union[None, int],
+        result: Union[None, str]
         ) -> None:
         """Method to update the decision after decision was reached
 
@@ -251,8 +260,9 @@ class Decision():
         Returns:
             None.
         """
+        hamsterwheel_id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
         # Get the latest hamsterwheel id
-        latest_wheel_id = latest_hamsterwheel['hamsterwheel_id']
+        latest_wheel_id = latest_hamsterwheel[hamsterwheel_id_col]
 
         table = self._db_tbl['DECISION']['name']
         end_time_col = self._db_tbl['DECISION']['end_time_col']
@@ -277,7 +287,7 @@ class Decision():
             print("Exeception occured:{}".format(e))
             logmsg = f'Failed update decision as closed with query: ' + qry
             log(
-                log_path=DECISION_LOG_FILE_PATH,
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
@@ -285,7 +295,7 @@ class Decision():
             self._mysql_connection.commit()   
             logmsg = f'Updated decision as closed with query: ' + qry
             log(
-                log_path=DECISION_LOG_FILE_PATH,
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
@@ -304,7 +314,11 @@ class Decision():
             Next decision.
         """
         # Check what the last closed decision was
-        latest_decision_type = latest_decision['type']
+        type_col = self._db_tbl['DECISION']['type_col']
+        latest_decision_type = latest_decision[type_col]
+        # Check the latest result, if it was a timeout, we go back to BUY_SELL
+        result_col = self._db_tbl['DECISION']['result_col']
+        latest_decision_result = latest_decision[result_col]
 
         # Move to the next decision option
         if latest_decision_type == BUY_SELL:
@@ -316,22 +330,25 @@ class Decision():
         else:
             logmsg = f'Decision type {latest_decision_type} not understood.'
             log(
-                log_path=DECISION_LOG_FILE_PATH,
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
             raise ValueError(logmsg)
         
+        if latest_decision_result == TIMEOUT:
+            next_decision_type = BUY_SELL
+        
         return next_decision_type
 
 
-    def update_decision_started(
+    def start_new_decision(
         self,
         next_decision_type: str,
         session_id: int,
         latest_hamsterwheel: pd.core.series.Series,
         ) -> pd.core.series.Series:
-        """Method to update the decision table with the next decision. Returns the next decision series.
+        """Method to start a new decision. Returns the next decision series.
 
         Args:
             next_decision: Next decision type.
@@ -342,7 +359,8 @@ class Decision():
             None.
         """
         # Get the latest hamsterwheel id
-        latest_wheel_id = latest_hamsterwheel['hamsterwheel_id']
+        hamsterwheel_id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
+        latest_wheel_id = latest_hamsterwheel[hamsterwheel_id_col]
 
         table = self._db_tbl['DECISION']['name']
         start_time_col = self._db_tbl['DECISION']['start_time_col']
@@ -373,7 +391,7 @@ class Decision():
             print("Exeception occured:{}".format(e))
             logmsg = f'Failed update decision as new decision with query: ' + qry
             log(
-                log_path=DECISION_LOG_FILE_PATH,
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
@@ -381,10 +399,49 @@ class Decision():
             self._mysql_connection.commit()   
             logmsg = f'Updated decision as new decision with query: ' + qry
             log(
-                log_path=DECISION_LOG_FILE_PATH,
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
+
+
+    def is_decision_timeout(
+        self,
+        latest_decision: pd.core.series.Series,
+        latest_hamsterwheel: pd.core.series.Series,
+        threshold: int = THRESHOLD_DECISION_TIMEOUT
+        ) -> bool:
+        """Method to check if an open decision is timed out.
+
+        If the last turn of the wheel is more than 120 seconds ago, the decision is considered timed out and will be closed.
+
+        Args:
+            latest_decision: Latest decision row.
+            latest_decision: Latest hamsterwheel row.
+            threshold: Time in seconds after which the decision is considered timed out.
+
+        Returns:
+            True if decision is timeout, False otherwise.
+        """
+        time_col = self._db_tbl['HAMSTERWHEEL']['time_col']
+        id_col = self._db_tbl['DECISION']['id_col']
+        # Time difference between last reading of the hamsterwheel and now
+        time_diff = (datetime.now() - latest_hamsterwheel[time_col]).total_seconds()
+
+        if time_diff > threshold:
+            # Decision is timed out
+            # Get the id
+            latest_decision_id = latest_decision[id_col]
+            # Add to the log
+            logmsg = f'Decision timed out, time difference was {time_diff} seconds. Decision id is {latest_decision_id}.'
+            log(
+                log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                logmsg=logmsg,
+                printout=PRINTOUT
+            )
+            return True
+        
+        return False
     
 
     
@@ -464,7 +521,7 @@ class Decision():
         logmsg = f'Current key is {self._current_decision_number}, next key is {next_key}, next decision is ' +\
             f'{self._decisions[str(next_key)]}'
         log(
-            log_path=DECISION_LOG_FILE_PATH,
+            log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
             logmsg=logmsg,
             printout=PRINTOUT
         )
@@ -488,7 +545,7 @@ class Decision():
                 # If the hamster has no cash, the decision is sell
                 logmsg = f'Hamster has no cash, cash is {cash}, decision is sell.'
                 log(
-                    log_path=DECISION_LOG_FILE_PATH,
+                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                     logmsg=logmsg,
                     printout=PRINTOUT
                 )
@@ -499,7 +556,7 @@ class Decision():
                 # If the hamster has no currencies, but some cash the decision is buy
                 logmsg = f'Hamster has no currencies but cash, number of currencies are {num_currencies}, decision is buy.'
                 log(
-                    log_path=DECISION_LOG_FILE_PATH,
+                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                     logmsg=logmsg,
                     printout=PRINTOUT
                 )
@@ -510,7 +567,7 @@ class Decision():
                 logmsg = f'Hamster is broke. Cash is {cash}, number of currencies are {num_currencies}.' +\
                     ' Hamster is done investing!'
                 log(
-                    log_path=DECISION_LOG_FILE_PATH,
+                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                     logmsg=logmsg,
                     printout=PRINTOUT
                 )

@@ -1,7 +1,14 @@
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Union
 import pandas as pd
 import pymysql
+
+from src.python.constants import (
+    FULL_PATH_TO_CREDENTIALS,
+    HOST_REMOTE,
+    DATABASE,
+    PORT
+)
 
 
 def log(log_path: str, logmsg: str, printout: bool = False) -> None:
@@ -44,11 +51,12 @@ def load_credentials(filepath: str) -> Tuple[str, str]:
 
     return (user, password)
 
+
 def get_latest_row_by_id(
     mysql_connection: pymysql.connections.Connection,
     table: str,
     id_col: str
-    ) -> pd.core.series.Series:
+    ) -> Union[None, pd.core.series.Series]:
     """Function to get the latest row of a table by id.
 
     The table is ordered descending by the `id_col` the last row is returned.
@@ -64,7 +72,37 @@ def get_latest_row_by_id(
         con=mysql_connection,
         index_col=id_col
     )
-    df = df.iloc[-1, :]
+    if len(df) > 0:
+        df = df.iloc[-1, :]
+        return df
+    else:
+        return None
 
-    return df
+def create_mysql_connection(
+    full_path_to_credentials: str = FULL_PATH_TO_CREDENTIALS,
+    host: str = HOST_REMOTE,
+    db: str = DATABASE,
+    port: str = int
+    ) -> pymysql.connections.Connection:
+    """Function to connect to the database.
 
+    Args:
+        full_path_to_credentials: Full path to the credentials to connect to the database.
+        host: Hostname.
+        db: Database name.
+        port: Which port to use.
+    """
+    # Load credentials to connect to the database
+    user, password = load_credentials(filepath=full_path_to_credentials)
+
+    # Create mysql connection
+    mysql_connection = pymysql.connect(
+        host=host,
+        user=user,
+        password=password,
+        db=db,
+        port=port,
+        charset='utf8'
+    )
+
+    return mysql_connection
