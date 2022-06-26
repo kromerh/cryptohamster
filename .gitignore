@@ -9,6 +9,6 @@ env/*
 env/**
 
 # logs
-*/logs
-logs/*
-logs/**
+*/log
+log/*
+log/**

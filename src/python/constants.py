@@ -1,5 +1,9 @@
 import numpy as np
 
+# Control if script is executed on a RPi or remote
+remote = True
+
+
 # RPi paths
 
 # Home directory on the RPi
@@ -18,6 +22,8 @@ HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
 # Log file for the decision class
 CRYPTOHAMSTER_LOG_FILE_PATH = f'{HOME}/log/cryptohamster.log'
+if remote:
+    CRYPTOHAMSTER_LOG_FILE_PATH = f'./log/cryptohamster.log'
 
 # Database
 
@@ -27,7 +33,9 @@ HOST_LOCAL = 'localhost'  # On the RPi local
 HOST_REMOTE = '192.168.1.105'  # Sometimes does not work: then use 192.168.1.105
 PORT = 3306
 FULL_PATH_TO_CREDENTIALS = f'{HOME}/credentials.cred'
-FULL_PATH_TO_CREDENTIALS_REMOTE = f'./credentials.cred'
+# For execution on another host
+if remote:
+    FULL_PATH_TO_CREDENTIALS = f'./credentials.cred'
 
 # Table for the wheel data
 NO_END_TIME = '0000-00-00 00:00:00.000000'

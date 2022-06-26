@@ -15,7 +15,7 @@ from constants import (
     TIMEOUT,
     CRYPTOHAMSTER_LOG_FILE_PATH,
     PRINTOUT,
-    FULL_PATH_TO_CREDENTIALS_REMOTE
+    FULL_PATH_TO_CREDENTIALS
 )
 
 from utils import (
@@ -25,7 +25,7 @@ from utils import (
 
 # Initialize
 # MySQL connection with default args
-mysql_connection = create_mysql_connection(full_path_to_credentials=FULL_PATH_TO_CREDENTIALS_REMOTE)
+mysql_connection = create_mysql_connection(full_path_to_credentials=FULL_PATH_TO_CREDENTIALS)
 
 # Session class
 sess = Session(mysql_connection)
