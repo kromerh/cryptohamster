@@ -12,7 +12,7 @@ CREATE TABLE session(
     end_time TIMESTAMP(6),
     end_type VARCHAR(50),
     PRIMARY KEY ( session_id ),
-    FOREIGN KEY ( start_hamsterwheel_id ) REFERENCES hamsterwheel( hamsterwheel_id )
+    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
 
 CREATE TABLE wallet(

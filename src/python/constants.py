@@ -27,6 +27,7 @@ HOST_LOCAL = 'localhost'  # On the RPi local
 HOST_REMOTE = '192.168.1.105'  # Sometimes does not work: then use 192.168.1.105
 PORT = 3306
 FULL_PATH_TO_CREDENTIALS = f'{HOME}/credentials.cred'
+FULL_PATH_TO_CREDENTIALS_REMOTE = f'./credentials.cred'
 
 # Table for the wheel data
 NO_END_TIME = '0000-00-00 00:00:00.000000'

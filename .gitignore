@@ -7,3 +7,8 @@ credentials.cred
 */env
 env/*
 env/**
+
+# logs
+*/logs
+logs/*
+logs/**

@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import Tuple, Union
 import pandas as pd
 import pymysql
+import os
 
-from src.python.constants import (
+from constants import (
     FULL_PATH_TO_CREDENTIALS,
     HOST_REMOTE,
     DATABASE,
@@ -82,7 +83,7 @@ def create_mysql_connection(
     full_path_to_credentials: str = FULL_PATH_TO_CREDENTIALS,
     host: str = HOST_REMOTE,
     db: str = DATABASE,
-    port: str = int
+    port: int = PORT
     ) -> pymysql.connections.Connection:
     """Function to connect to the database.
 
@@ -93,6 +94,7 @@ def create_mysql_connection(
         port: Which port to use.
     """
     # Load credentials to connect to the database
+    # cwd = os.getcwd()
     user, password = load_credentials(filepath=full_path_to_credentials)
 
     # Create mysql connection

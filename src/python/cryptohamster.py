@@ -1,14 +1,21 @@
+from numpy import full
 from decision import Decision
 from session import Session
 import pandas as pd
 from typing import List
 import time
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+
 
 from constants import (
     BUY_SELL,
     TIMEOUT,
     CRYPTOHAMSTER_LOG_FILE_PATH,
     PRINTOUT,
+    FULL_PATH_TO_CREDENTIALS_REMOTE
 )
 
 from utils import (
@@ -18,7 +25,7 @@ from utils import (
 
 # Initialize
 # MySQL connection with default args
-mysql_connection = create_mysql_connection()
+mysql_connection = create_mysql_connection(full_path_to_credentials=FULL_PATH_TO_CREDENTIALS_REMOTE)
 
 # Session class
 sess = Session(mysql_connection)
@@ -77,7 +84,7 @@ try:
             main_trigger = False
 
         # If there is no session, initialize one
-        if (latest_session == None):
+        if (latest_session is None):
             # Initialize only if the hamster is running
             if main_trigger:
                 sess.start_new_session(start_hamsterwheel_id=latest_hamsterwheel.name)
@@ -112,7 +119,7 @@ try:
                 # Session is running and not timed out yet
                 else:
                     # Check if a decision is running
-                    if latest_decision == None:
+                    if latest_decision is None:
                         # There is no decision in the database
                         if main_trigger:
                             _ = dec.start_new_decision(
