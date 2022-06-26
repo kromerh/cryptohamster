@@ -7,6 +7,10 @@ import time
 import os
 import sys
 
+# Pandas will warn us that we are using pymysql instead of SQLAlchemy, we are fine with that.
+import warnings
+warnings.simplefilter(action='ignore', category=UserWarning)
+
 sys.path.append(os.path.dirname(__file__))
 
 
@@ -206,6 +210,9 @@ try:
                         logmsg=logmsg,
                         printout=PRINTOUT
                     )
-        time.sleep(0.05)
+        time.sleep(0.75)
 except KeyboardInterrupt:
     mysql_connection.close()
+finally:
+    if mysql_connection.open:
+        mysql_connection.close()
