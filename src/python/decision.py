@@ -47,26 +47,14 @@ class Decision():
         """Class instantiation.
 
         Args:
-            mysql_kwargs: MySQL keyword arguments
+            mysql_connection: MySQL connection
 
         """
-        # List of available decisions
-        self._decision_options = DECISION_OPTIONS
-        # Which decision is currently being processed
-        self._current_decision_number = 0
-        # Instantiate decision lists
-        self._currency = []
-        self._amount = AMOUNT
-        # MySQL tables
+        # Database tables
         self._db_tbl = DB_TBL
-        self._mysql_kwargs = Decision._validate_mysql_kwargs(mysql_kwargs)
+        # MySQL connection
+        self._mysql_connection = mysql_connection
 
-        # Connect to the db
-        self.connect_to_database()
-
-        # Get wallet
-        self._wallet = self.get_wallet()
-    
 
     def get_latest_decision(self) -> pd.core.series.Series:
         """Method to get the latest entry in the decision table. 
