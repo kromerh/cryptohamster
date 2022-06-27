@@ -27,23 +27,21 @@ class Session():
     
     def __init__(
         self,
-        mysql_connection: pymysql.connections.Connection,
-
         ) -> None:
         """Class instantiation.
-
-        Args:
-            mysql_connection: MySQL connection
-
         """
         # Database tables
         self._db_tbl = DB_TBL
-        # MySQL connection
-        self._mysql_connection = mysql_connection
         
     
-    def get_latest_session(self) -> Union[None, pd.core.series.Series]:
+    def get_latest_session(
+        self,
+        mysql_connection: pymysql.connections.Connection,
+        ) -> Union[None, pd.core.series.Series]:
         """Method to get the latest entry in the session table. 
+
+        Args:
+            mysql_connection: MySQL connection
 
         Returns:
             Series with the latest session. If there is no latest session, returns None.
@@ -52,7 +50,7 @@ class Session():
         id_col = self._db_tbl['SESSION']['id_col']
 
         s = get_latest_row_by_id(
-            mysql_connection=self._mysql_connection,
+            mysql_connection=mysql_connection,
             table=table,
             id_col=id_col
         )
@@ -60,8 +58,14 @@ class Session():
         return s
 
 
-    def get_latest_hamsterwheel(self) -> Union[None, pd.core.series.Series]:
+    def get_latest_hamsterwheel(
+        self,
+        mysql_connection: pymysql.connections.Connection,
+        ) -> Union[None, pd.core.series.Series]:
         """Method to get the latest entry in the hamsterwheel table. 
+
+        Args:
+            mysql_connection: MySQL connection
 
         Returns:
             Series with the latest session. If there is no latest session, returns None.
@@ -70,7 +74,7 @@ class Session():
         id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
 
         s = get_latest_row_by_id(
-            mysql_connection=self._mysql_connection,
+            mysql_connection=mysql_connection,
             table=table,
             id_col=id_col
         )
@@ -78,11 +82,16 @@ class Session():
         return s
 
 
-    def start_new_session(self, start_hamsterwheel_id) -> None:
+    def start_new_session(
+        self,
+        mysql_connection: pymysql.connections.Connection,
+        start_hamsterwheel_id: int
+        ) -> None:
         """Method to start a new session. Updates the database.
 
         Args:
             start_hamsterwheel_id: Id of the hamsterwheel when the session started.
+            mysql_connection: MySQL connection
         
         Returns:
             None.
@@ -100,23 +109,22 @@ class Session():
               f') ' +\
               f'VALUES ' +\
               f'( ' +\
-              f'{now}, ' +\
+              f'\"{now}\", ' +\
               f'{start_hamsterwheel_id} ' +\
               f')'
         try:
-            cursor = self._mysql_connection.cursor()
+            cursor = mysql_connection.cursor()
             cursor.execute(qry)
-        except Exception as e:
-            print("Exeception occured:{}".format(e))
-            logmsg = f'Failed insert new session with query: ' + qry
+            mysql_connection.commit()   
+            logmsg = f'Started new session with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
-        finally:
-            self._mysql_connection.commit()   
-            logmsg = f'Started new session with query: ' + qry
+        except Exception as e:
+            print("Exeception occured:{}".format(e))
+            logmsg = f'Failed insert new session with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
@@ -133,10 +141,11 @@ class Session():
         Returns:
             True if there is a running session, False otherwise.
         """
-        if latest_session['end_time'] == NO_END_TIME:
-            return False
-        else:
+        end_time_col = self._db_tbl['SESSION']['end_time_col']
+        if latest_session[end_time_col] == NO_END_TIME:
             return True
+        else:
+            return False
 
 
     def is_session_timeout(
@@ -179,12 +188,14 @@ class Session():
     def update_session_closed(
         self,
         latest_session: pd.core.series.Series,
+        mysql_connection: pymysql.connections.Connection,
         end_type: str
         ) -> None:
         """Method to update the session and maark it as closed.
 
         Args:
             latest_session: Latest session row.
+            mysql_connection: MySQL connection
             end_type: Reason for decision closing.
         
         Returns:
@@ -202,19 +213,18 @@ class Session():
               f'{end_type_col} = {end_type} ' +\
               f'WHERE {id_col} = {latest_session.name}'
         try:
-            cursor = self._mysql_connection.cursor()
+            cursor = mysql_connection.cursor()
             cursor.execute(qry)
-        except Exception as e:
-            print("Exeception occured:{}".format(e))
-            logmsg = f'Failed update session as closed with query: ' + qry
+            mysql_connection.commit()   
+            logmsg = f'Updated session as closed with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
-        finally:
-            self._mysql_connection.commit()   
-            logmsg = f'Updated session as closed with query: ' + qry
+        except Exception as e:
+            print("Exeception occured:{}".format(e))
+            logmsg = f'Failed update session as closed with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,

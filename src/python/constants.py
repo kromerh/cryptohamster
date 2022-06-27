@@ -1,8 +1,9 @@
 import numpy as np
 
 # Control if script is executed on a RPi or remote
-remote = True
-
+remote = True  # Set to False if run on RPi
+# Control if test tables or real tables should be used
+test = True  # Set to False during real run
 
 # RPi paths
 
@@ -40,13 +41,25 @@ if remote:
 # Table for the wheel data
 NO_END_TIME = '0000-00-00 00:00:00.000000'
 TABLE_HAMSTERWHEEL = 'hamsterwheel'
+
+if test:
+    DECISION_TBL = 'TEST_decision'
+    WALLET_TBL = 'TEST_wallet'
+    SESSION_TBL= 'TEST_session'
+    HAMSTERWHEEL_TBL= 'TEST_hamsterwheel'
+else:
+    DECISION_TBL = 'decision'
+    WALLET_TBL = 'wallet'
+    SESSION_TBL = 'session'
+    HAMSTERWHEEL_TBL = 'hamsterwheel'
+
 DB_TBL = {
     'WALLET': {
-        'name': 'wallet',
+        'name': WALLET_TBL,
         'id_col': 'wallet_id'
     },
     'DECISION': {
-        'name': 'decision',
+        'name': DECISION_TBL,
         'id_col': 'decision_id',
         'session_id_col': 'session_id',
         'start_time_col': 'start_time',
@@ -58,12 +71,12 @@ DB_TBL = {
         'wheel_turns_col': 'wheel_turns',
     },
     'HAMSTERWHEEL': {
-        'name': 'hamsterwheel',
+        'name': HAMSTERWHEEL_TBL,
         'id_col': 'hamsterwheel_id',
         'time_col': 'time',
     },
     'SESSION': {
-        'name': 'session',
+        'name': SESSION_TBL,
         'id_col': 'session_id',
         'start_time_col': 'start_time',
         'end_time_col': 'end_time',
@@ -71,6 +84,8 @@ DB_TBL = {
         'hamsterwheel_id_start_col': 'hamsterwheel_id_start',
     },
 }
+
+
 
 # Decisions
 BUY_SELL = 'buy_sell'

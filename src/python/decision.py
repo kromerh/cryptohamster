@@ -41,23 +41,22 @@ class Decision():
     
     def __init__(
         self,
-        mysql_connection: pymysql.connections.Connection,
-
         ) -> None:
         """Class instantiation.
-
-        Args:
-            mysql_connection: MySQL connection
 
         """
         # Database tables
         self._db_tbl = DB_TBL
-        # MySQL connection
-        self._mysql_connection = mysql_connection
 
 
-    def get_latest_decision(self) -> pd.core.series.Series:
+    def get_latest_decision(
+        self,
+        mysql_connection: pymysql.connections.Connection,
+        ) -> pd.core.series.Series:
         """Method to get the latest entry in the decision table. 
+
+        Args:
+            mysql_connection: MySQL connection
 
         Returns:
             Series with the latest decision.
@@ -66,7 +65,7 @@ class Decision():
         id_col = self._db_tbl['DECISION']['id_col']
 
         s = get_latest_row_by_id(
-            mysql_connection=self._mysql_connection,
+            mysql_connection=mysql_connection,
             table=table,
             id_col=id_col
         )
@@ -74,8 +73,14 @@ class Decision():
         return s
 
 
-    def get_latest_hamsterwheel(self) -> pd.core.series.Series:
+    def get_latest_hamsterwheel(
+        self,
+        mysql_connection: pymysql.connections.Connection,
+        ) -> pd.core.series.Series:
         """Method to get the latest entry in the hamsterwheel table. 
+
+        Args:
+            mysql_connection: MySQL connection
 
         Returns:
             Series with the latest hamsterwheel table.
@@ -84,7 +89,7 @@ class Decision():
         id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
 
         s = get_latest_row_by_id(
-            mysql_connection=self._mysql_connection,
+            mysql_connection=mysql_connection,
             table=table,
             id_col=id_col
         )
@@ -100,9 +105,9 @@ class Decision():
         """
         end_time_col = self._db_tbl['DECISION']['end_time_col']
         if latest_decision[end_time_col] == NO_END_TIME:
-            return False
-        else:
             return True
+        else:
+            return False
 
 
     def is_decision_reached(
@@ -129,7 +134,7 @@ class Decision():
         if time_diff > threshold:
             # Decision is reached
             # Get the id
-            latest_wheel_id = latest_hamsterwheel[id_col]
+            latest_wheel_id = latest_hamsterwheel.name
             # Add to the log
             logmsg = f'Decision reached, time difference was {time_diff} seconds. Hamsterwheel id is {latest_wheel_id}'
             log(
@@ -145,6 +150,7 @@ class Decision():
 
     def calculate_num_of_wheel_turns(
         self,
+        mysql_connection: pymysql.connections.Connection,
         latest_decision: pd.core.series.Series,
         latest_hamsterwheel: pd.core.series.Series,
         threshold_deadtime: float = 0.7
@@ -152,6 +158,7 @@ class Decision():
         """Method to calculate the number of wheel turns in the recent decision cycle.
 
         Args:
+            mysql_connection: MySQL connection
             latest_decision: Latest decision row.
             latest_hamsterwheel: Series with the latest hamsterwheel from the database.
             threshold_deadtime: Sensor readout is faster than passing of the magnet. Entries in the database
@@ -167,7 +174,7 @@ class Decision():
 
         # Get the latest hamsterwheel ids
         begin_wheel_id = latest_decision[decision_hamsterwheel_id_start]
-        end_wheel_id = latest_hamsterwheel[id_col]
+        end_wheel_id = latest_hamsterwheel.name
 
         # Retrieve the hamsterwheel data for these ids        
         qry = f'SELECT * FROM {table} ' +\
@@ -175,7 +182,7 @@ class Decision():
         
         wheel_data = pd.read_sql(
             sql=qry,
-            con=self._mysql_connection,
+            con=mysql_connection,
             index_col=id_col
         )
         # Remove entries from the dataset that are very short apart
@@ -232,6 +239,7 @@ class Decision():
 
     def update_decision_closed(
         self,
+        mysql_connection: pymysql.connections.Connection,
         latest_decision: pd.core.series.Series,
         latest_hamsterwheel: pd.core.series.Series,
         wheel_turns: Union[None, int],
@@ -240,6 +248,7 @@ class Decision():
         """Method to update the decision after decision was reached
 
         Args:
+            mysql_connection: MySQL connection
             latest_decision: Latest decision row.
             latest_hamsterwheel: Series with the latest hamsterwheel from the database.
             wheel_turns: Number of wheel turns between start and end time.
@@ -248,9 +257,8 @@ class Decision():
         Returns:
             None.
         """
-        hamsterwheel_id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
         # Get the latest hamsterwheel id
-        latest_wheel_id = latest_hamsterwheel[hamsterwheel_id_col]
+        latest_wheel_id = latest_hamsterwheel.name
 
         table = self._db_tbl['DECISION']['name']
         end_time_col = self._db_tbl['DECISION']['end_time_col']
@@ -263,25 +271,24 @@ class Decision():
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         qry = f'UPDATE {table} ' +\
               f'SET ' +\
-              f'{end_time_col} = \"{now}\" ' +\
-              f'{hamsterwheel_id_end_col} = {latest_wheel_id} ' +\
-              f'{result_col} = {result} ' +\
+              f'{end_time_col} = \"{now}\", ' +\
+              f'{hamsterwheel_id_end_col} = {latest_wheel_id}, ' +\
+              f'{result_col} = \"{result}\", ' +\
               f'{wheel_turns_col} = {wheel_turns} ' +\
               f'WHERE {id_col} = {latest_decision.name}'
         try:
-            cursor = self._mysql_connection.cursor()
+            cursor = mysql_connection.cursor()
             cursor.execute(qry)
-        except Exception as e:
-            print("Exeception occured:{}".format(e))
-            logmsg = f'Failed update decision as closed with query: ' + qry
+            mysql_connection.commit()   
+            logmsg = f'Updated decision as closed with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
-        finally:
-            self._mysql_connection.commit()   
-            logmsg = f'Updated decision as closed with query: ' + qry
+        except Exception as e:
+            print("Exeception occured:{}".format(e))
+            logmsg = f'Failed update decision as closed with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
@@ -332,24 +339,23 @@ class Decision():
 
     def start_new_decision(
         self,
+        mysql_connection: pymysql.connections.Connection,
         next_decision_type: str,
         session_id: int,
-        latest_hamsterwheel: pd.core.series.Series,
+        latest_hamsterwheel_id: int,
         ) -> pd.core.series.Series:
         """Method to start a new decision. Returns the next decision series.
 
         Args:
+            mysql_connection: MySQL connection
             next_decision: Next decision type.
             session_id: Current session id.
-            latest_hamsterwheel: Series with the latest hamsterwheel from the database.
+            latest_hamsterwheel_id: Latest hamsterwheel id from the database.
         
         Returns:
             None.
         """
         # Get the latest hamsterwheel id
-        hamsterwheel_id_col = self._db_tbl['HAMSTERWHEEL']['id_col']
-        latest_wheel_id = latest_hamsterwheel[hamsterwheel_id_col]
-
         table = self._db_tbl['DECISION']['name']
         start_time_col = self._db_tbl['DECISION']['start_time_col']
         session_id_col = self._db_tbl['DECISION']['session_id_col']
@@ -368,24 +374,23 @@ class Decision():
               f'VALUES ' +\
               f'( ' +\
               f'{session_id}, ' +\
-              f'{next_decision_type}, ' +\
-              f'{now}, ' +\
-              f'{latest_wheel_id} ' +\
+              f'\"{next_decision_type}\", ' +\
+              f'\"{now}\", ' +\
+              f'{latest_hamsterwheel_id} ' +\
               f')'
         try:
-            cursor = self._mysql_connection.cursor()
+            cursor = mysql_connection.cursor()
             cursor.execute(qry)
-        except Exception as e:
-            print("Exeception occured:{}".format(e))
-            logmsg = f'Failed update decision as new decision with query: ' + qry
+            mysql_connection.commit()
+            logmsg = f'Updated decision as new decision with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
-        finally:
-            self._mysql_connection.commit()   
-            logmsg = f'Updated decision as new decision with query: ' + qry
+        except Exception as e:
+            print("Exeception occured:{}".format(e))
+            logmsg = f'Failed update decision as new decision with query: ' + qry
             log(
                 log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
                 logmsg=logmsg,
@@ -412,14 +417,13 @@ class Decision():
             True if decision is timeout, False otherwise.
         """
         time_col = self._db_tbl['HAMSTERWHEEL']['time_col']
-        id_col = self._db_tbl['DECISION']['id_col']
         # Time difference between last reading of the hamsterwheel and now
         time_diff = (datetime.now() - latest_hamsterwheel[time_col]).total_seconds()
 
         if time_diff > threshold:
             # Decision is timed out
             # Get the id
-            latest_decision_id = latest_decision[id_col]
+            latest_decision_id = latest_decision.name
             # Add to the log
             logmsg = f'Decision timed out, time difference was {time_diff} seconds. Decision id is {latest_decision_id}.'
             log(
