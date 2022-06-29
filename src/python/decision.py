@@ -47,6 +47,7 @@ class Decision():
         """
         # Database tables
         self._db_tbl = DB_TBL
+        self._decision_options = DECISION_OPTIONS
 
 
     def get_latest_decision(
@@ -188,7 +189,7 @@ class Decision():
         # Remove entries from the dataset that are very short apart
         # The hamster cannot run that fast, see EDA notebook. These readings come from the sensor readout being
         # faster than the magnet can pass the sensor.
-        wheel_data['diff'] = (wheel_data[hamsterhweel_time_col].shift(1) - wheel_data[hamsterhweel_time_col]).dt.total_seconds()
+        wheel_data['diff'] = np.abs((wheel_data[hamsterhweel_time_col] - wheel_data[hamsterhweel_time_col].shift(1)).dt.total_seconds())
         # Get a True/False series using the threshold
         mask_deadtime = wheel_data['diff'] > threshold_deadtime
         num_wheelturns = mask_deadtime.sum()
@@ -227,7 +228,7 @@ class Decision():
 
         result = multiplied_list[num_wheelturns]
         
-        logmsg = f'Decision determined: ' + result
+        logmsg = f'Decision determined: {result}'
         log(
             log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
             logmsg=logmsg,

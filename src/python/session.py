@@ -172,7 +172,7 @@ class Session():
         if time_diff > threshold:
             # Session is timed out
             # Get the id
-            latest_session_id = latest_session[id_col]
+            latest_session_id = latest_session.name
             # Add to the log
             logmsg = f'Session timed out, time difference was {time_diff} seconds. Session id is {latest_session_id}.'
             log(
@@ -209,9 +209,9 @@ class Session():
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         qry = f'UPDATE {table} ' +\
               f'SET ' +\
-              f'{end_time_col} = \"{now}\" ' +\
-              f'{end_type_col} = {end_type} ' +\
-              f'WHERE {id_col} = {latest_session.name}'
+              f'{end_time_col} = \"{now}\", ' +\
+              f'{end_type_col} = \"{end_type}\" ' +\
+              f'WHERE {id_col} = \"{latest_session.name}\"'
         try:
             cursor = mysql_connection.cursor()
             cursor.execute(qry)

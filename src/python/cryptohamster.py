@@ -130,7 +130,8 @@ try:
                     dec.update_decision_closed(
                         mysql_connection=mysql_connection,
                         latest_decision=latest_decision,
-                        wheel_turns=None,
+                        latest_hamsterwheel=latest_hamsterwheel,
+                        wheel_turns='NULL',
                         result=TIMEOUT
                         )
 
@@ -176,15 +177,15 @@ try:
                                 )
                             # Decision not timed out
                             else:
-                                logmsg = f'Decision is active and not timed out.'
-                                log(
-                                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
-                                    logmsg=logmsg,
-                                    printout=PRINTOUT
-                                )
                                 # Check if the decision is reached
                                 if dec.is_decision_reached(latest_hamsterwheel=latest_hamsterwheel):
                                     # Decision has been reached
+                                    logmsg = f'Decision has been reached.'
+                                    log(
+                                        log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                                        logmsg=logmsg,
+                                        printout=PRINTOUT
+                                    )
                                     num_wheelturns = dec.calculate_num_of_wheel_turns(
                                         mysql_connection=mysql_connection,
                                         latest_decision=latest_decision,
@@ -215,15 +216,30 @@ try:
                             
                         # There is a decision in the database, and it is closed. No active decision
                         else:
-                            # Get the next decision
-                            next_decision = dec.get_next_decision(latest_decision=latest_decision)
-                            # Start a new decision
-                            _ = dec.start_new_decision(
-                                mysql_connection=mysql_connection,
-                                next_decision_type=next_decision,
-                                session_id=latest_session.name,
-                                latest_hamsterwheel_id=latest_hamsterwheel.name
-                            )
+                            # Check if the hamster is running
+                            if main_trigger:
+                                # Get the next decision
+                                next_decision = dec.get_next_decision(latest_decision=latest_decision)
+                                # Start a new decision
+                                _ = dec.start_new_decision(
+                                    mysql_connection=mysql_connection,
+                                    next_decision_type=next_decision,
+                                    session_id=latest_session.name,
+                                    latest_hamsterwheel_id=latest_hamsterwheel.name)
+                                logmsg = f'No decision active, hamster is running. Started new decision {next_decision}.'
+                                log(
+                                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                                    logmsg=logmsg,
+                                    printout=PRINTOUT
+                                )
+                            else:
+                                # Hamster is not running
+                                logmsg = f'No decision active, hamster is not running. Doing nothing.'
+                                log(
+                                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                                    logmsg=logmsg,
+                                    printout=PRINTOUT
+                                )
             # There is no session running (and the database has a closed session)
             else:
                 # Check if the hamster is running

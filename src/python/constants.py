@@ -96,7 +96,7 @@ THRESHOLD_DECISION_TIMEOUT = 120
 
 DECISION_OPTIONS = {
     BUY_SELL: ['BUY', 'SELL'],
-    CURRENCY: [],  # is queried from the database
+    CURRENCY: ['cash', 'btc', 'eth'],  # is queried from the database
     AMOUNT: list(np.arange(1, 101))  # 1 to 100 %
 }
 
