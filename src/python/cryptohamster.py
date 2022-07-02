@@ -1,4 +1,3 @@
-from numpy import full
 from decision import Decision
 from session import Session
 import pandas as pd
