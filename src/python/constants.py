@@ -45,18 +45,22 @@ TABLE_HAMSTERWHEEL = 'hamsterwheel'
 if test:
     DECISION_TBL = 'TEST_decision'
     WALLET_TBL = 'TEST_wallet'
-    SESSION_TBL= 'TEST_session'
-    HAMSTERWHEEL_TBL= 'TEST_hamsterwheel'
+    SESSION_TBL = 'TEST_session'
+    HAMSTERWHEEL_TBL = 'TEST_hamsterwheel'
+    TRADEBOOK_TBL = 'TEST_tradebook'
 else:
     DECISION_TBL = 'decision'
     WALLET_TBL = 'wallet'
     SESSION_TBL = 'session'
     HAMSTERWHEEL_TBL = 'hamsterwheel'
+    TRADEBOOK_TBL = 'tradebook'
 
 DB_TBL = {
     'WALLET': {
         'name': WALLET_TBL,
-        'id_col': 'wallet_id'
+        'id_col': 'wallet_id',
+        'currency_symbol_col': 'currency_symbol',
+        'amount_col': 'amount'
     },
     'DECISION': {
         'name': DECISION_TBL,
@@ -83,6 +87,17 @@ DB_TBL = {
         'end_type_col': 'end_type',
         'hamsterwheel_id_start_col': 'hamsterwheel_id_start',
     },
+    'TRADEBOOK': {
+        'name': TRADEBOOK_TBL,
+        'id_col': 'tradebook_id',
+        'session_id_col': 'session_id', 
+        'decision_id_col': 'decision_id',
+        'buy_sell_col': 'buy_sell',
+        'currency_symbol_col': 'currency_symbol',
+        'cash_amount_col': 'cash_amount',
+        'ccy_amount_col': 'ccy_amount',
+        'time_col': 'time'
+    }
 }
 
 

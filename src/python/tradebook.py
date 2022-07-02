@@ -22,42 +22,68 @@ class Tradebook:
     
     def __init__(
         self,
+        mysql_connection: pymysql.connections.Connection,
+        session_id: int,
+        decision_id: int,
+        buy_sell_result: str,
+        currency: str,
+        amount_percentage: float
         ) -> None:
         """Class instantiation.
+
+        Args:
+            mysql_connection: MySQL connection
+            session_id: Active session id.
+            decision_id: Active decision id.
+            buy_sell_result: Result of the buy / sell decision.
+            currency: Cryptocurrency to buy.
+            amount_percentage: Percentage amount of the currency to buy or sell.
         """
         # Database tables
         self._db_tbl = DB_TBL
         # Decision options
         self._buy_sell_decision = DECISION_OPTIONS[BUY_SELL]
+        # Change in cash amount due to the trade
+        self._cash_amount = 0
+        # Change in ccy amount due to the trade
+        self._ccy_amount = 0
         
+        self._mysql_connection = mysql_connection
+        self._session_id = session_id
+        self._decision_id = decision_id
+        self._buy_sell_result = buy_sell_result
+        self._currency = currency
+        self._amount_percentage = amount_percentage
 
-    def calculate_amount(
+    def process_trade(
         self,
         wallet: Dict[str , float],
-        available_funds: float,
-        amount_percentage: float,
-        buy_sell_result: str,
-        currency: str,
-        ) -> float:
-        """Method to calculate the amount of a currency to buy or sell.
+        ) -> None:
+        """Method to process the trade.
 
         Args:
+            mysql_connection: MySQL connection
             wallet: Wallet of the hamster.
             available_funds: Number that is USD either available cash (in buy scenario) or available
                 amount in a currency.
-            amount_percentage: Percentage value that comes from the decision wheel.
+            amount_percentage: Percentage value that comes from the decision wheel. Should be between 0.1 and 1.0
             buy_sell_result: Result of the buy / sell decision.
             currency: Cryptocurrency to buy.
+            price: Price of the currency in USD.
         
         Returns:
-            Amount to either buy or sell.
+            None.
         """
         # If buy
-        if buy_sell_result == self._buy_sell_decision['BUY']:
+        if self._buy_sell_result == self._buy_sell_decision['BUY']:
             # Check how much cash the hamster holds
             cash = wallet['CASH']
-            # Amount to buy is cash times the amount percentage from the decision
-            amount = amount_percentage * cash
+            # Cash amount to spend
+            self._cash_amount = self._amount_percentage * cash
+            # Amount the hamster can buy with that cash
+            self._ccy_amount = self._cash_amount * price
+            # Update tradebook
+
         
         elif buy_sell_result == self._buy_sell_decision['SELL']:
             # if sell
@@ -82,22 +108,12 @@ class Tradebook:
 
     def update_tradebook(
         self,
-        mysql_connection: pymysql.connections.Connection,
-        session_id: int,
-        decision_id: int,
-        buy_sell_result: str,
-        currency: str,
-        amount: float
+        
         ) -> None:
         """Method to update the tradebook. Updates the MySQL table.
 
         Args:
-            mysql_connection: MySQL connection
-            session_id: Active session id.
-            decision_id: Active decision id.
-            buy_sell_result: Result of the buy / sell decision.
-            currency: Cryptocurrency to buy.
-            amount: Amount of the currency to buy.
+            
         
         Returns:
             None.

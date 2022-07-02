@@ -27,7 +27,8 @@ CREATE TABLE tradebook(
     session_id INT,
     direction VARCHAR(50) NOT NULL,
     currency_symbol VARCHAR(50) NOT NULL,
-    amount FLOAT NOT NULL,
+    cash_amount FLOAT NOT NULL,
+    ccy_amount FLOAT NOT NULL,
     time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY ( tradebook_id ),
     FOREIGN KEY ( session_id ) REFERENCES session( session_id )
@@ -69,12 +70,14 @@ CREATE TABLE TEST_session(
 CREATE TABLE TEST_tradebook(
     tradebook_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
-    direction VARCHAR(50) NOT NULL,
+    decision_id INT,
+    buy_sell VARCHAR(50) NOT NULL,
     currency_symbol VARCHAR(50) NOT NULL,
     amount FLOAT NOT NULL,
     time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY ( tradebook_id ),
-    FOREIGN KEY ( session_id ) REFERENCES session( session_id )
+    FOREIGN KEY ( session_id ) REFERENCES session( session_id ),
+    FOREIGN KEY ( decision_id ) REFERENCES decision( decision_id )
 );
 
 CREATE TABLE TEST_decision(
