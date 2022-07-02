@@ -202,6 +202,9 @@ try:
                                         wheel_turns=num_wheelturns,
                                         result=result
                                     )
+                                    # Check if the trade can be kicked off because all decisions are there
+                                    
+
 
                                 # Decision has not been reached yet
                                 else:
