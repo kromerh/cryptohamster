@@ -119,3 +119,6 @@ DECISION_OPTIONS = {
 # Session can end either with a BUY or SELL or TIMEOUT
 SESSION_END_TYPES = ['BUY', 'SELL', 'TIMEOUT']
 THRESHOLD_SESSION_TIMEOUT = 3600
+
+# Currencies
+CASH = 'CASH'

@@ -1,6 +1,6 @@
 import pandas as pd
 import pymysql
-from typing import Union
+from typing import Union, Dict
 from datetime import datetime
 
 from constants import (

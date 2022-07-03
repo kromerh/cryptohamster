@@ -3,7 +3,8 @@ from subprocess import IDLE_PRIORITY_CLASS
 import numpy as np
 import pymysql
 import pandas as pd
-from typing import Dict, Union
+from typing import Dict, Union, List
+import sys
 
 from utils import (
     get_latest_row_by_id,
@@ -13,6 +14,7 @@ from utils import (
 from constants import (
     CRYPTOHAMSTER_LOG_FILE_PATH,
     DB_TBL,
+    CASH,
     PRINTOUT,
     NO_END_TIME,
     DECISION_OPTIONS,
@@ -22,6 +24,8 @@ from constants import (
     TIMEOUT,
     THRESHOLD_DECISION_TIMEOUT
 )
+
+from binance import Binance
 
 # MySQL tables
 # Wallet: Contains what cryptocurrencices the hamster holds in its wallet
@@ -38,7 +42,7 @@ THRESHOLD_CASH = 10 # USD
 class Decision():
     """Class that contains logic to come to a decision using the hamsterwheel
     """
-    
+
     def __init__(
         self,
         ) -> None:
@@ -48,7 +52,6 @@ class Decision():
         # Database tables
         self._db_tbl = DB_TBL
         self._decision_options = DECISION_OPTIONS
-
 
     def get_latest_decision(
         self,
@@ -73,7 +76,6 @@ class Decision():
 
         return s
 
-
     def get_latest_hamsterwheel(
         self,
         mysql_connection: pymysql.connections.Connection,
@@ -97,7 +99,6 @@ class Decision():
 
         return s
     
-
     def is_decision_open(self, latest_decision: pd.core.series.Series) -> bool:
         """Method to determine if a decision is open.
 
@@ -109,7 +110,6 @@ class Decision():
             return True
         else:
             return False
-
 
     def is_decision_reached(
         self,
@@ -147,7 +147,6 @@ class Decision():
             return True
         
         return False
-
 
     def calculate_num_of_wheel_turns(
         self,
@@ -196,7 +195,6 @@ class Decision():
 
         return num_wheelturns
 
-
     def determine_decision(
         self,
         latest_decision: pd.core.series.Series,
@@ -236,7 +234,6 @@ class Decision():
         )
 
         return result
-
 
     def update_decision_closed(
         self,
@@ -296,7 +293,6 @@ class Decision():
                 printout=PRINTOUT
             )
 
-
     def get_next_decision(
         self,
         latest_decision: pd.core.series.Series,
@@ -337,7 +333,6 @@ class Decision():
         
         return next_decision_type
 
-
     def start_new_decision(
         self,
         mysql_connection: pymysql.connections.Connection,
@@ -362,7 +357,6 @@ class Decision():
         session_id_col = self._db_tbl['DECISION']['session_id_col']
         hamsterwheel_id_start_col = self._db_tbl['DECISION']['hamsterwheel_id_start_col']
         type_col = self._db_tbl['DECISION']['type_col']
-
 
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         qry = f'INSERT INTO {table} ' +\
@@ -397,7 +391,6 @@ class Decision():
                 logmsg=logmsg,
                 printout=PRINTOUT
             )
-
 
     def is_decision_timeout(
         self,
@@ -436,3 +429,46 @@ class Decision():
         
         return False
     
+    def get_decision_options(
+        self,
+        mysql_connection: pymysql.connections.Connection,
+        wallet: Dict[str, float]
+    ) -> Dict[str, List[str]]:
+        """Method to get the decision options.
+
+        Args:
+            mysql_connection: MySQL connection
+            wallet: Wallet of the hamster.
+        
+        Returns:
+            Dictionary with the decision options.
+        """
+        # Currencies the hamster holds
+        currencies = list(wallet.keys())
+        currencies.remove(CASH)
+
+        # Cash amount the hamster holds
+        cash = wallet[CASH]
+
+        # BUY_SELL
+        # If the hamster has no currencies, we can only buy
+        if len(currencies) == 0:
+            if cash > 0:
+                self._decision_options[BUY_SELL] = ['BUY']
+            # Hamster is broke
+            else:
+                logmsg = f'Hamster is broke! No currencies and no cash.'
+                log(
+                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                    logmsg=logmsg,
+                    printout=PRINTOUT
+                )
+                sys.exit()
+
+        else:
+            self._decision_options[BUY_SELL] = ['BUY', 'SELL']
+        
+        # CURRENCY
+        # Retrieve the list of available currencies from binance
+        currencies = Binance.get_available_currencies()
+        self._decision_options[CURRENCY] = currencies

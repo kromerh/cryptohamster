@@ -25,7 +25,7 @@ CREATE TABLE wallet(
 CREATE TABLE tradebook(
     tradebook_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
-    direction VARCHAR(50) NOT NULL,
+    buy_sell VARCHAR(50) NOT NULL,
     currency_symbol VARCHAR(50) NOT NULL,
     cash_amount FLOAT NOT NULL,
     ccy_amount FLOAT NOT NULL,
