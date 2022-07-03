@@ -1,5 +1,7 @@
 from decision import Decision
 from session import Session
+from wallet import Wallet
+from tradebook import Tradebook
 import pandas as pd
 from typing import List
 import time
@@ -15,6 +17,9 @@ sys.path.append(os.path.dirname(__file__))
 
 from constants import (
     BUY_SELL,
+    CURRENCY,
+    AMOUNT,
+    DB_TBL,
     TIMEOUT,
     CRYPTOHAMSTER_LOG_FILE_PATH,
     PRINTOUT,
@@ -30,6 +35,8 @@ from utils import (
 sess = Session()
 # Decision
 dec = Decision()
+# Wallet
+wallet = Wallet()
 
 # Last hamsterwheel readings
 hamsterwheel_readings = []
@@ -190,10 +197,13 @@ try:
                                         latest_decision=latest_decision,
                                         latest_hamsterwheel=latest_hamsterwheel
                                     )
+                                    # Read the wallet again
+                                    wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
                                     # Get the result
                                     result = dec.determine_decision(
                                         latest_decision=latest_decision,
-                                        num_wheelturns=num_wheelturns
+                                        num_wheelturns=num_wheelturns,
+                                        wallet=wallet
                                     )
                                     dec.update_decision_closed(
                                         mysql_connection=mysql_connection,
@@ -203,6 +213,50 @@ try:
                                         result=result
                                     )
                                     # Check if the trade can be kicked off because all decisions are there
+                                    # Retrieve the past 3 decisions from the decisions table
+                                    past_decisions = dec.get_latest_decision(
+                                        mysql_connection=mysql_connection,
+                                        num_rows=3
+                                    )
+                                    # if dec.check_all_decisions_for_trade(
+                                    #     past_decisions=past_decisions,
+                                    #     mysql_connection=mysql_connection
+                                    #     ):
+                                        
+                                    #     type_col = DB_TBL['DECISION']['type_col']
+                                    #     result_col = DB_TBL['DECISION']['result_col']
+                                        
+                                    #     # Buy sell result
+                                    #     m_buy_sell = past_decisions[type_col] == BUY_SELL
+                                    #     buy_sell_result = past_decisions.loc[m_buy_sell, :].loc[:, result_col].values[0]
+                                    #     # Currency result
+                                    #     m_currency = past_decisions[type_col] == CURRENCY
+                                    #     currency_result = past_decisions.loc[m_currency, :].loc[:, result_col].values[0]
+                                    #     # Amount result
+                                    #     m_amount = past_decisions[type_col] == AMOUNT
+                                    #     amount_result = past_decisions.loc[m_amount, :].loc[:, result_col].values[0]
+                                        
+                                    #     tradebook = Tradebook(
+                                    #         session_id=latest_session.name,
+                                    #         decision_id=latest_decision.name,
+                                    #         buy_sell_result=buy_sell_result,
+                                    #         currency=currency_result,
+                                    #         amount_percentage=amount_result
+                                    #     )
+
+                                    #     # Read the wallet again
+                                    #     wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
+                                        
+                                    #     # process the trade
+                                    #     tradebook.process_trade(
+                                    #         mysql_connection=mysql_connection,
+                                    #         wallet=wallet
+                                    #     )
+
+                                    
+                                    # # Not all decisions were reached, continue
+                                    # else:
+                                    #     pass
                                     
 
 

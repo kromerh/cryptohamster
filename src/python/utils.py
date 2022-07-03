@@ -52,12 +52,12 @@ def load_credentials(filepath: str) -> Tuple[str, str]:
 
     return (user, password)
 
-
 def get_latest_row_by_id(
     mysql_connection: pymysql.connections.Connection,
     table: str,
-    id_col: str
-    ) -> Union[None, pd.core.series.Series]:
+    id_col: str,
+    num_rows: int = 1
+    ) -> Union[None, pd.core.series.Series, pd.DataFrame]:
     """Function to get the latest row of a table by id.
 
     The table is ordered descending by the `id_col` the last row is returned.
@@ -66,16 +66,22 @@ def get_latest_row_by_id(
         mysql_connection: MySQL connection
         table: Table name.
         id_col: ID column. 
+    
+    Returns:
+        Either None or the past num_rows as series (num_rows = 1) or dataframe (num_rows > 1). 
     """
-    qry = f'SELECT * FROM {table} ORDER BY {id_col} DESC LIMIT 1'
+    qry = f'SELECT * FROM {table} ORDER BY {id_col} DESC LIMIT {num_rows}'
     df = pd.read_sql(
         sql=qry,
         con=mysql_connection,
         index_col=id_col
     )
     if len(df) > 0:
-        df = df.iloc[-1, :]
-        return df
+        if num_rows == 1:
+            df = df.iloc[-1, :]
+            return df
+        else:
+            return df
     else:
         return None
 

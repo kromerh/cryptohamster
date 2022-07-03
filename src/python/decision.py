@@ -56,11 +56,13 @@ class Decision():
     def get_latest_decision(
         self,
         mysql_connection: pymysql.connections.Connection,
+        num_rows: int = 1
         ) -> pd.core.series.Series:
         """Method to get the latest entry in the decision table. 
 
         Args:
             mysql_connection: MySQL connection
+            num_rows: How many past decisions should be retrieved, defaults to 1.
 
         Returns:
             Series with the latest decision.
@@ -71,7 +73,8 @@ class Decision():
         s = get_latest_row_by_id(
             mysql_connection=mysql_connection,
             table=table,
-            id_col=id_col
+            id_col=id_col,
+            num_rows=num_rows
         )
 
         return s
@@ -197,6 +200,7 @@ class Decision():
 
     def determine_decision(
         self,
+        wallet: Dict[str, float],
         latest_decision: pd.core.series.Series,
         num_wheelturns: int
         ) -> str:
@@ -212,6 +216,9 @@ class Decision():
         type_col = self._db_tbl['DECISION']['type_col']
         # Get the current decision
         current_decision = latest_decision[type_col]
+
+        # Update the decision options
+        self.get_decision_options(mysql_connection=None, wallet=wallet)
 
         # Lookup the list of possible decision from the dictionary
         decision_list = self._decision_options[current_decision]
@@ -433,7 +440,7 @@ class Decision():
         self,
         mysql_connection: pymysql.connections.Connection,
         wallet: Dict[str, float]
-    ) -> Dict[str, List[str]]:
+    ) -> None:
         """Method to get the decision options.
 
         Args:
@@ -464,11 +471,49 @@ class Decision():
                     printout=PRINTOUT
                 )
                 sys.exit()
-
         else:
             self._decision_options[BUY_SELL] = ['BUY', 'SELL']
         
         # CURRENCY
         # Retrieve the list of available currencies from binance
-        currencies = Binance.get_available_currencies()
+        currencies = Binance().get_available_currencies()
         self._decision_options[CURRENCY] = currencies
+
+    def check_all_decisions_for_trade(
+        self,
+        past_decisions: pd.DataFrame,
+        mysql_connection: pymysql.connections.Connection,
+    ) -> bool:
+        """Method to check if all decisions for a trade have been concluded.
+
+        These are:
+            * BUY_SELL
+            * CURRENCY
+            * AMOUNT
+
+        Args:
+            past_decisions: Dataframe with the last three decisions.
+            mysql_connection: MySQL connection
+        
+        Returns:
+            True if all the decisions necessary for a trade have been reached, False otherwise.
+        """
+        # List of decisions
+        decisions_list = list(self._decision_options.keys())
+        
+        # Check if all the decisions are there
+        type_col = self._db_tbl['DECISION']['type_col']
+        if sorted(decisions_list) == sorted(list(past_decisions[type_col])):
+            response = True
+            logmsg = f'Decisions complete to start a trade.'
+        else:
+            logmsg = f'Decisions not complete to start a trade.'
+            response= False
+        
+        log(
+            log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+            logmsg=logmsg,
+            printout=PRINTOUT
+        )
+
+        return response

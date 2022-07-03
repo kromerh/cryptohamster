@@ -67,17 +67,23 @@ CREATE TABLE TEST_session(
     FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
 
+CREATE TABLE TEST_wallet(
+    wallet_id INT NOT NULL AUTO_INCREMENT,
+    currency_symbol VARCHAR(50) NOT NULL,
+    amount FLOAT NOT NULL,
+    PRIMARY KEY ( wallet_id )
+);
+
 CREATE TABLE TEST_tradebook(
     tradebook_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
-    decision_id INT,
     buy_sell VARCHAR(50) NOT NULL,
     currency_symbol VARCHAR(50) NOT NULL,
-    amount FLOAT NOT NULL,
+    cash_amount FLOAT NOT NULL,
+    ccy_amount FLOAT NOT NULL,
     time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY ( tradebook_id ),
-    FOREIGN KEY ( session_id ) REFERENCES session( session_id ),
-    FOREIGN KEY ( decision_id ) REFERENCES decision( decision_id )
+    FOREIGN KEY ( session_id ) REFERENCES session( session_id )
 );
 
 CREATE TABLE TEST_decision(
@@ -94,3 +100,7 @@ CREATE TABLE TEST_decision(
     FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id ),
     FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
+
+-- Give the hamster 10k USD to start
+INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("CASH", 10000.0);
+INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("BTC", 9999.0);

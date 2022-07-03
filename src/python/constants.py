@@ -110,9 +110,9 @@ TIMEOUT = 'timeout'
 THRESHOLD_DECISION_TIMEOUT = 120
 
 DECISION_OPTIONS = {
-    BUY_SELL: ['BUY', 'SELL'],
-    CURRENCY: ['cash', 'btc', 'eth'],  # is queried from the database
-    AMOUNT: list(np.arange(1, 101))  # 1 to 100 %
+    BUY_SELL: [],  # is queried from the database
+    CURRENCY: [],  # is queried from the database
+    AMOUNT: list(np.arange(0.1, 1.05, 0.05))  # 1 to 100 %
 }
 
 # Session

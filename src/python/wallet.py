@@ -43,14 +43,20 @@ class Wallet:
         """
         table = self._db_tbl['WALLET']['name']
         id_col = self._db_tbl['WALLET']['id_col']
+        currency_symbol_col = self._db_tbl['WALLET']['currency_symbol_col']
+        amount_col = self._db_tbl['WALLET']['amount_col']
 
         qry = f'SELECT * FROM {table}'
         
-        wallet = pd.read_sql(
+        df_wallet = pd.read_sql(
             sql=qry,
             con=mysql_connection,
             index_col=id_col
         )
+        
+        wallet = {}
+        for item in df_wallet.iterrows():
+            wallet[item[1][currency_symbol_col]] = item[1][amount_col]
 
         return wallet
 
