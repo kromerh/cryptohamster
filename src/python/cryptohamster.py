@@ -102,12 +102,14 @@ try:
                     start_hamsterwheel_id=latest_hamsterwheel.name
                 )
                 latest_session = sess.get_latest_session(mysql_connection=mysql_connection)
+                latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
                 # Start also a new decision, the starting one is always buy/sell
                 _ = dec.start_new_decision(
                     mysql_connection=mysql_connection,
                     next_decision_type=BUY_SELL,
                     session_id=latest_session.name,
-                    latest_hamsterwheel_id=latest_hamsterwheel.name
+                    latest_hamsterwheel_id=latest_hamsterwheel.name,
+                    latest_decision=latest_decision
                 )
             else:
                 # Hamster is not running
@@ -147,11 +149,13 @@ try:
                     if latest_decision is None:
                         # There is no decision in the database
                         if main_trigger:
+                            latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
                             _ = dec.start_new_decision(
                                 mysql_connection=mysql_connection,
                                 next_decision_type=BUY_SELL,
                                 session_id=latest_session.name,
-                                latest_hamsterwheel_id=latest_hamsterwheel.name
+                                latest_hamsterwheel_id=latest_hamsterwheel.name,
+                                latest_decision=latest_decision
                             )
                         # No decision in the database, but hamster is not running
                         # Note: This event can occur after the decision table was wiped.
@@ -218,45 +222,45 @@ try:
                                         mysql_connection=mysql_connection,
                                         num_rows=3
                                     )
-                                    # if dec.check_all_decisions_for_trade(
-                                    #     past_decisions=past_decisions,
-                                    #     mysql_connection=mysql_connection
-                                    #     ):
+                                    if dec.check_all_decisions_for_trade(
+                                        past_decisions=past_decisions,
+                                        mysql_connection=mysql_connection
+                                        ):
                                         
-                                    #     type_col = DB_TBL['DECISION']['type_col']
-                                    #     result_col = DB_TBL['DECISION']['result_col']
+                                        type_col = DB_TBL['DECISION']['type_col']
+                                        result_col = DB_TBL['DECISION']['result_col']
                                         
-                                    #     # Buy sell result
-                                    #     m_buy_sell = past_decisions[type_col] == BUY_SELL
-                                    #     buy_sell_result = past_decisions.loc[m_buy_sell, :].loc[:, result_col].values[0]
-                                    #     # Currency result
-                                    #     m_currency = past_decisions[type_col] == CURRENCY
-                                    #     currency_result = past_decisions.loc[m_currency, :].loc[:, result_col].values[0]
-                                    #     # Amount result
-                                    #     m_amount = past_decisions[type_col] == AMOUNT
-                                    #     amount_result = past_decisions.loc[m_amount, :].loc[:, result_col].values[0]
+                                        # Buy sell result
+                                        m_buy_sell = past_decisions[type_col] == BUY_SELL
+                                        buy_sell_result = past_decisions.loc[m_buy_sell, :].loc[:, result_col].values[0]
+                                        # Currency result
+                                        m_currency = past_decisions[type_col] == CURRENCY
+                                        currency_result = past_decisions.loc[m_currency, :].loc[:, result_col].values[0]
+                                        # Amount result
+                                        m_amount = past_decisions[type_col] == AMOUNT
+                                        amount_result = past_decisions.loc[m_amount, :].loc[:, result_col].values[0]
                                         
-                                    #     tradebook = Tradebook(
-                                    #         session_id=latest_session.name,
-                                    #         decision_id=latest_decision.name,
-                                    #         buy_sell_result=buy_sell_result,
-                                    #         currency=currency_result,
-                                    #         amount_percentage=amount_result
-                                    #     )
+                                        tradebook = Tradebook(
+                                            session_id=latest_session.name,
+                                            decision_id=latest_decision.name,
+                                            buy_sell_result=buy_sell_result,
+                                            currency=currency_result,
+                                            amount_percentage=amount_result
+                                        )
 
-                                    #     # Read the wallet again
-                                    #     wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
+                                        # Read the wallet again
+                                        wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
                                         
-                                    #     # process the trade
-                                    #     tradebook.process_trade(
-                                    #         mysql_connection=mysql_connection,
-                                    #         wallet=wallet
-                                    #     )
+                                        # process the trade
+                                        tradebook.process_trade(
+                                            mysql_connection=mysql_connection,
+                                            wallet=wallet
+                                        )
 
                                     
-                                    # # Not all decisions were reached, continue
-                                    # else:
-                                    #     pass
+                                    # Not all decisions were reached, continue
+                                    else:
+                                        pass
                                     
 
 
@@ -276,12 +280,15 @@ try:
                             if main_trigger:
                                 # Get the next decision
                                 next_decision = dec.get_next_decision(latest_decision=latest_decision)
+                                latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
                                 # Start a new decision
                                 _ = dec.start_new_decision(
                                     mysql_connection=mysql_connection,
                                     next_decision_type=next_decision,
                                     session_id=latest_session.name,
-                                    latest_hamsterwheel_id=latest_hamsterwheel.name)
+                                    latest_hamsterwheel_id=latest_hamsterwheel.name,
+                                    latest_decision=latest_decision
+                                )
                                 logmsg = f'No decision active, hamster is running. Started new decision {next_decision}.'
                                 log(
                                     log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
@@ -305,12 +312,14 @@ try:
                         start_hamsterwheel_id=latest_hamsterwheel.name
                     )
                     latest_session = sess.get_latest_session(mysql_connection=mysql_connection)
+                    latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
                     # Start also a new decision, the starting one is always buy/sell
                     _ = dec.start_new_decision(
                         mysql_connection=mysql_connection,
                         next_decision_type=BUY_SELL,
                         session_id=latest_session.name,
-                        latest_hamsterwheel_id=latest_hamsterwheel.name
+                        latest_hamsterwheel_id=latest_hamsterwheel.name,
+                        latest_decision=latest_decision
                     )
                 # Hamster is not running
                 else:

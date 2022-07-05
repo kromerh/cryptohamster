@@ -14,6 +14,8 @@ from utils import (
 from constants import (
     CRYPTOHAMSTER_LOG_FILE_PATH,
     DB_TBL,
+    BUY,
+    SELL,
     CASH,
     PRINTOUT,
     NO_END_TIME,
@@ -346,6 +348,7 @@ class Decision():
         next_decision_type: str,
         session_id: int,
         latest_hamsterwheel_id: int,
+        latest_decision: pd.core.series.Series,
         ) -> pd.core.series.Series:
         """Method to start a new decision. Returns the next decision series.
 
@@ -354,21 +357,33 @@ class Decision():
             next_decision: Next decision type.
             session_id: Current session id.
             latest_hamsterwheel_id: Latest hamsterwheel id from the database.
+            latest_decision: Latest decision from the database.
         
         Returns:
             None.
         """
-        # Get the latest hamsterwheel id
         table = self._db_tbl['DECISION']['name']
         start_time_col = self._db_tbl['DECISION']['start_time_col']
         session_id_col = self._db_tbl['DECISION']['session_id_col']
         hamsterwheel_id_start_col = self._db_tbl['DECISION']['hamsterwheel_id_start_col']
         type_col = self._db_tbl['DECISION']['type_col']
+        decision_cycle_col = self._db_tbl['DECISION']['decision_cycle_col']
+
+        # Get the current decision cycle
+        if latest_decision is None:
+            decision_cycle = 1
+        else:      
+            if next_decision_type == BUY_SELL:  
+                # If buy or sell, increase the decision cycle by one
+                decision_cycle = int(latest_decision[decision_cycle_col]) + 1
+            else:
+                decision_cycle = int(latest_decision[decision_cycle_col])
 
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         qry = f'INSERT INTO {table} ' +\
               f'( ' +\
               f'{session_id_col}, ' +\
+              f'{decision_cycle_col}, ' +\
               f'{type_col}, ' +\
               f'{start_time_col}, ' +\
               f'{hamsterwheel_id_start_col} ' +\
@@ -376,6 +391,7 @@ class Decision():
               f'VALUES ' +\
               f'( ' +\
               f'{session_id}, ' +\
+              f'{decision_cycle}, ' +\
               f'\"{next_decision_type}\", ' +\
               f'\"{now}\", ' +\
               f'{latest_hamsterwheel_id} ' +\
@@ -461,7 +477,7 @@ class Decision():
         # If the hamster has no currencies, we can only buy
         if len(currencies) == 0:
             if cash > 0:
-                self._decision_options[BUY_SELL] = ['BUY']
+                self._decision_options[BUY_SELL] = [BUY]
             # Hamster is broke
             else:
                 logmsg = f'Hamster is broke! No currencies and no cash.'
@@ -472,7 +488,7 @@ class Decision():
                 )
                 sys.exit()
         else:
-            self._decision_options[BUY_SELL] = ['BUY', 'SELL']
+            self._decision_options[BUY_SELL] = [BUY, SELL]
         
         # CURRENCY
         # Retrieve the list of available currencies from binance
@@ -503,9 +519,15 @@ class Decision():
         
         # Check if all the decisions are there
         type_col = self._db_tbl['DECISION']['type_col']
-        if sorted(decisions_list) == sorted(list(past_decisions[type_col])):
-            response = True
-            logmsg = f'Decisions complete to start a trade.'
+        decision_cycle_col = self._db_tbl['DECISION']['decision_cycle_col']
+        # Check if there is only on decision cycle in the past three rows
+        if len(set(list(past_decisions[decision_cycle_col]))) == 1:
+            if set(decisions_list) == set(list(past_decisions[type_col])):
+                response = True
+                logmsg = f'Decisions complete to start a trade.'
+            else:
+                logmsg = f'Decisions not complete to start a trade.'
+                response= False
         else:
             logmsg = f'Decisions not complete to start a trade.'
             response= False

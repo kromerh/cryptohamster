@@ -65,6 +65,7 @@ DB_TBL = {
     'DECISION': {
         'name': DECISION_TBL,
         'id_col': 'decision_id',
+        'decision_cycle_col': 'decision_cycle',
         'session_id_col': 'session_id',
         'start_time_col': 'start_time',
         'end_time_col': 'end_time',
@@ -103,6 +104,8 @@ DB_TBL = {
 
 
 # Decisions
+BUY = 'BUY'
+SELL = 'SELL'
 BUY_SELL = 'buy_sell'
 CURRENCY = 'currency'
 AMOUNT = 'amount'
@@ -112,12 +115,12 @@ THRESHOLD_DECISION_TIMEOUT = 120
 DECISION_OPTIONS = {
     BUY_SELL: [],  # is queried from the database
     CURRENCY: [],  # is queried from the database
-    AMOUNT: list(np.arange(0.1, 1.05, 0.05))  # 1 to 100 %
+    AMOUNT: [np.round(x, 2) for x in list(np.arange(0.1, 1.05, 0.05))]  # 1 to 100 %
 }
 
 # Session
 # Session can end either with a BUY or SELL or TIMEOUT
-SESSION_END_TYPES = ['BUY', 'SELL', 'TIMEOUT']
+SESSION_END_TYPES = [BUY, SELL, 'TIMEOUT']
 THRESHOLD_SESSION_TIMEOUT = 3600
 
 # Currencies

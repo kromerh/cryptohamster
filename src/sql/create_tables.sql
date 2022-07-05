@@ -37,6 +37,7 @@ CREATE TABLE tradebook(
 CREATE TABLE decision(
     decision_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
+    decision_cycle INT NOT NULL,
     type VARCHAR(50) NOT NULL,
     result VARCHAR(50),
     start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -89,6 +90,7 @@ CREATE TABLE TEST_tradebook(
 CREATE TABLE TEST_decision(
     decision_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
+    decision_cycle INT NOT NULL,
     type VARCHAR(50) NOT NULL,
     result VARCHAR(50),
     start_time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -103,4 +105,6 @@ CREATE TABLE TEST_decision(
 
 -- Give the hamster 10k USD to start
 INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("CASH", 10000.0);
-INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("BTC", 9999.0);
+INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("btc", 999.0);
+INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("eth", 888.0);
+INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("wilson", 777.0);

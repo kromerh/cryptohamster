@@ -36,7 +36,7 @@ class Binance():
             Price in USD.
         """
 
-        price = np.round(np.random(0, 1000), 2)
+        price = np.round(np.abs(np.random.normal(0,1,1)[0]), 2)
             
         logmsg = f'Price for {self._currency} is {price}.'
         log(

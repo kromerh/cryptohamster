@@ -13,7 +13,8 @@ from constants import (
     CRYPTOHAMSTER_LOG_FILE_PATH,
     PRINTOUT,
     DECISION_OPTIONS,
-    BUY_SELL
+    BUY,
+    SELL
 )
 
 from binance import Binance
@@ -46,7 +47,8 @@ class Tradebook:
         # Database tables
         self._db_tbl = DB_TBL
         # Decision options
-        self._buy_sell_decision = DECISION_OPTIONS[BUY_SELL]
+        self._buy = BUY
+        self._sell = SELL
         # Change in cash amount due to the trade
         self._cash_amount = 0
         # Change in ccy amount due to the trade
@@ -56,7 +58,7 @@ class Tradebook:
         self._decision_id = decision_id
         self._buy_sell_result = buy_sell_result
         self._currency = currency
-        self._amount_percentage = amount_percentage
+        self._amount_percentage = float(amount_percentage)
 
     def get_latest_trade(
         self,
@@ -99,10 +101,10 @@ class Tradebook:
             None.
         """
         # Retrieve the price of the cryptocurrency, units of CCY/USD
-        price = Binance(currency=self._currency)
+        price = Binance(currency=self._currency).get_price()
 
         # If buy
-        if self._buy_sell_result == self._buy_sell_decision['BUY']:
+        if self._buy_sell_result == self._buy:
             # Check how much cash the hamster holds
             cash = wallet['CASH']
             # Cash amount to spend
@@ -111,7 +113,7 @@ class Tradebook:
             self._ccy_amount = self._cash_amount * price
 
         # if sell
-        elif self._buy_sell_result == self._buy_sell_decision['SELL']:
+        elif self._buy_sell_result == self._sell:
             # Get how much of the currency the hamster holds
             available_funds = wallet[self._currency]
             # Calculate amount to sell
