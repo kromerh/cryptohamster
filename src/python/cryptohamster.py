@@ -229,6 +229,7 @@ try:
                                         
                                         type_col = DB_TBL['DECISION']['type_col']
                                         result_col = DB_TBL['DECISION']['result_col']
+                                        decision_cycle_col = DB_TBL['DECISION']['decision_cycle_col']
                                         
                                         # Buy sell result
                                         m_buy_sell = past_decisions[type_col] == BUY_SELL
@@ -242,7 +243,7 @@ try:
                                         
                                         tradebook = Tradebook(
                                             session_id=latest_session.name,
-                                            decision_id=latest_decision.name,
+                                            decision_cycle=latest_decision[decision_cycle_col],
                                             buy_sell_result=buy_sell_result,
                                             currency=currency_result,
                                             amount_percentage=amount_result

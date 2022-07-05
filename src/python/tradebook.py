@@ -29,7 +29,7 @@ class Tradebook:
         self,
         
         session_id: int,
-        decision_id: int,
+        decision_cycle: int,
         buy_sell_result: str,
         currency: str,
         amount_percentage: float
@@ -39,7 +39,7 @@ class Tradebook:
         Args:
             mysql_connection: MySQL connection
             session_id: Active session id.
-            decision_id: Active decision id.
+            decision_cycle: Active decision cycle.
             buy_sell_result: Result of the buy / sell decision.
             currency: Cryptocurrency to buy.
             amount_percentage: Percentage amount of the currency to buy or sell.
@@ -55,7 +55,7 @@ class Tradebook:
         self._ccy_amount = 0
         
         self._session_id = session_id
-        self._decision_id = decision_id
+        self._decision_cycle = decision_cycle
         self._buy_sell_result = buy_sell_result
         self._currency = currency
         self._amount_percentage = float(amount_percentage)
@@ -148,7 +148,7 @@ class Tradebook:
         """
         table = self._db_tbl['TRADEBOOK']['name']
         session_id_col = self._db_tbl['TRADEBOOK']['session_id_col']
-        decision_id_col = self._db_tbl['TRADEBOOK']['decision_id_col']
+        decision_cycle_col = self._db_tbl['DECISION']['decision_cycle_col']
         buy_sell_col = self._db_tbl['TRADEBOOK']['buy_sell_col']
         currency_symbol_col = self._db_tbl['TRADEBOOK']['currency_symbol_col']
         cash_amount_col = self._db_tbl['TRADEBOOK']['cash_amount_col']
@@ -159,7 +159,7 @@ class Tradebook:
         qry = f'INSERT INTO {table} ' +\
               f'( ' +\
               f'{session_id_col}, ' +\
-              f'{decision_id_col}, ' +\
+              f'{decision_cycle_col}, ' +\
               f'{buy_sell_col}, ' +\
               f'{currency_symbol_col}, ' +\
               f'{cash_amount_col}, ' +\
@@ -169,7 +169,7 @@ class Tradebook:
               f'VALUES ' +\
               f'( ' +\
               f'{self._session_id}, ' +\
-              f'{self._decision_id}, ' +\
+              f'{self._decision_cycle}, ' +\
               f'\"{self._buy_sell_result}\", ' +\
               f'\"{self._currency}\", ' +\
               f'{self._cash_amount}, ' +\

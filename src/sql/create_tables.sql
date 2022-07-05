@@ -77,7 +77,8 @@ CREATE TABLE TEST_wallet(
 
 CREATE TABLE TEST_tradebook(
     tradebook_id INT NOT NULL AUTO_INCREMENT,
-    session_id INT,
+    session_id INT NOT NULL,
+    decision_cycle INT NOT NULL,
     buy_sell VARCHAR(50) NOT NULL,
     currency_symbol VARCHAR(50) NOT NULL,
     cash_amount FLOAT NOT NULL,
