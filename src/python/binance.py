@@ -27,7 +27,7 @@ class Binance():
             None.
         """
         if currency:
-            self._ccy = currency
+            self._currency = currency
     
     def get_price(self) -> float:
         """Method to get the price of a cryptocurrency.
