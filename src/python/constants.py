@@ -97,6 +97,7 @@ DB_TBL = {
         'currency_symbol_col': 'currency_symbol',
         'cash_amount_col': 'cash_amount',
         'ccy_amount_col': 'ccy_amount',
+        'ccy_price_col': 'ccy_price',
         'time_col': 'time'
     }
 }

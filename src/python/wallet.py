@@ -11,7 +11,9 @@ from constants import (
     DB_TBL,
     CRYPTOHAMSTER_LOG_FILE_PATH,
     PRINTOUT,
-    CASH
+    CASH,
+    BUY,
+    SELL
 )
 
 class Wallet:
@@ -27,6 +29,9 @@ class Wallet:
         """
         # Database tables
         self._db_tbl = DB_TBL
+        # Decision options
+        self._buy = BUY
+        self._sell = SELL
         
 
     def get_wallet(
@@ -189,14 +194,14 @@ class Wallet:
         current_cash_amount = wallet[CASH]
 
         # If result was buy
-        if buy_sell_result == self._buy_sell_decision['BUY']:
+        if buy_sell_result == self._buy:
             # How much cash is the hamster spending
             new_cash_amount = current_cash_amount - cash_amount
             # How much of the currency do we get
             new_ccy_amount = current_ccy_amount + ccy_amount
         
         # If result was sell
-        elif buy_sell_result == self._buy_sell_decision['SELL']:    
+        elif buy_sell_result == self._sell:    
             # How much ccy is the hamster selling
             new_ccy_amount = current_ccy_amount - ccy_amount
             # How much cash do we get

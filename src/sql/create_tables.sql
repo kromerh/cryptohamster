@@ -29,6 +29,7 @@ CREATE TABLE tradebook(
     currency_symbol VARCHAR(50) NOT NULL,
     cash_amount FLOAT NOT NULL,
     ccy_amount FLOAT NOT NULL,
+    ccy_price FLOAT NOT NULL,
     time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY ( tradebook_id ),
     FOREIGN KEY ( session_id ) REFERENCES session( session_id )
@@ -65,7 +66,7 @@ CREATE TABLE TEST_session(
     end_time TIMESTAMP(6),
     end_type VARCHAR(50),
     PRIMARY KEY ( session_id ),
-    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id )
+    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES TEST_hamsterwheel( hamsterwheel_id )
 );
 
 CREATE TABLE TEST_wallet(
@@ -83,9 +84,10 @@ CREATE TABLE TEST_tradebook(
     currency_symbol VARCHAR(50) NOT NULL,
     cash_amount FLOAT NOT NULL,
     ccy_amount FLOAT NOT NULL,
+    ccy_price FLOAT NOT NULL,
     time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY ( tradebook_id ),
-    FOREIGN KEY ( session_id ) REFERENCES session( session_id )
+    FOREIGN KEY ( session_id ) REFERENCES TEST_session( session_id )
 );
 
 CREATE TABLE TEST_decision(
@@ -100,8 +102,8 @@ CREATE TABLE TEST_decision(
     hamsterwheel_id_end INT,
     wheel_turns INT,
     PRIMARY KEY ( decision_id ),
-    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id ),
-    FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES hamsterwheel( hamsterwheel_id )
+    FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES TEST_hamsterwheel( hamsterwheel_id ),
+    FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES TEST_hamsterwheel( hamsterwheel_id )
 );
 
 -- Give the hamster 10k USD to start

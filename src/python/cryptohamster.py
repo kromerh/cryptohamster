@@ -258,6 +258,14 @@ try:
                                             wallet=wallet
                                         )
 
+                                        # Update the wallet with the trade
+                                        latest_trade = tradebook.get_latest_trade(mysql_connection=mysql_connection)
+                                        Wallet().update_wallet(
+                                            mysql_connection=mysql_connection,
+                                            wallet=wallet,
+                                            latest_trade=latest_trade
+                                        )
+
                                     
                                     # Not all decisions were reached, continue
                                     else:

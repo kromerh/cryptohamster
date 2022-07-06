@@ -12,7 +12,6 @@ from constants import (
     DB_TBL,
     CRYPTOHAMSTER_LOG_FILE_PATH,
     PRINTOUT,
-    DECISION_OPTIONS,
     BUY,
     SELL
 )
@@ -102,6 +101,7 @@ class Tradebook:
         """
         # Retrieve the price of the cryptocurrency, units of CCY/USD
         price = Binance(currency=self._currency).get_price()
+        self._price = price
 
         # If buy
         if self._buy_sell_result == self._buy:
@@ -154,6 +154,7 @@ class Tradebook:
         cash_amount_col = self._db_tbl['TRADEBOOK']['cash_amount_col']
         ccy_amount_col = self._db_tbl['TRADEBOOK']['ccy_amount_col']
         time_col = self._db_tbl['TRADEBOOK']['time_col']
+        ccy_price_col = self._db_tbl['TRADEBOOK']['ccy_price_col']
 
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         qry = f'INSERT INTO {table} ' +\
@@ -164,6 +165,7 @@ class Tradebook:
               f'{currency_symbol_col}, ' +\
               f'{cash_amount_col}, ' +\
               f'{ccy_amount_col}, ' +\
+              f'{ccy_price_col}, ' +\
               f'{time_col} ' +\
               f') ' +\
               f'VALUES ' +\
@@ -174,6 +176,7 @@ class Tradebook:
               f'\"{self._currency}\", ' +\
               f'{self._cash_amount}, ' +\
               f'{self._ccy_amount}, ' +\
+              f'{self._price}, ' +\
               f'\"{now}\" ' +\
               f')'
         try:
