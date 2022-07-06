@@ -3,7 +3,7 @@ from subprocess import IDLE_PRIORITY_CLASS
 import numpy as np
 import pymysql
 import pandas as pd
-from typing import Dict, Union, List
+from typing import Any, Dict, Union, List
 import sys
 
 from utils import (
@@ -37,7 +37,7 @@ WALLET = 'wallet'
 # Threshold in seconds between the latest reading of the wheel and the current time
 THRESHOLD_DECISION = 5
 
-# Threshold for the cash amount the hamster holds below which the hamster is broke
+# Threshold for the cash amount the hamster holds below which the hamster can only sell
 THRESHOLD_CASH = 10 # USD
 
 
@@ -220,7 +220,7 @@ class Decision():
         current_decision = latest_decision[type_col]
 
         # Update the decision options
-        self.get_decision_options(mysql_connection=None, wallet=wallet)
+        self.update_decision_options(wallet=wallet, get_currencies=True)
 
         # Lookup the list of possible decision from the dictionary
         decision_list = self._decision_options[current_decision]
@@ -374,6 +374,7 @@ class Decision():
             decision_cycle = 1
         else:      
             if next_decision_type == BUY_SELL:  
+                # Check if the hamster holds cash to buy
                 # If buy or sell, increase the decision cycle by one
                 decision_cycle = int(latest_decision[decision_cycle_col]) + 1
             else:
@@ -452,16 +453,16 @@ class Decision():
         
         return False
     
-    def get_decision_options(
+    def update_decision_options(
         self,
-        mysql_connection: pymysql.connections.Connection,
-        wallet: Dict[str, float]
+        wallet: Dict[str, float],
+        get_currencies: bool = False
     ) -> None:
         """Method to get the decision options.
 
         Args:
-            mysql_connection: MySQL connection
             wallet: Wallet of the hamster.
+            get_currencies: Flag to control to also retrieve currencies from Binance to buy.
         
         Returns:
             Dictionary with the decision options.
@@ -488,12 +489,31 @@ class Decision():
                 )
                 sys.exit()
         else:
-            self._decision_options[BUY_SELL] = [BUY, SELL]
+            # If the hamster has no cash, we can only sell
+            if cash < THRESHOLD_CASH:
+                self._decision_options[BUY_SELL] = [SELL]
+                logmsg = f'Hamster is out of cash, can only sell.'
+                log(
+                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                    logmsg=logmsg,
+                    printout=PRINTOUT
+                )
+            else:
+                self._decision_options[BUY_SELL] = [BUY, SELL]
         
         # CURRENCY
-        # Retrieve the list of available currencies from binance
-        currencies = Binance().get_available_currencies()
-        self._decision_options[CURRENCY] = currencies
+        if get_currencies:
+            # Retrieve the list of available currencies from binance
+            currencies = Binance().get_available_currencies()
+            self._decision_options[CURRENCY] = currencies
+
+    def get_decision_options(self) -> Dict[str, List[Any]]:
+        """Method to return the decision options.
+
+        Returns:
+            Dictionary of the decision options.
+        """
+        return self._decision_options
 
     def check_all_decisions_for_trade(
         self,

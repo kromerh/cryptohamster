@@ -217,7 +217,7 @@ class Wallet:
             raise ValueError(logmsg)
 
         # Update CCY query
-        qry_ccy = self.get_qry_update_wallet_ccy(new_ccy_amount=new_ccy_amount)
+        qry_ccy = self.get_qry_update_wallet_ccy(new_ccy_amount=new_ccy_amount, currency=currency)
         # Update CASH query
         qry_cash = self.get_qry_update_wallet_cash(new_cash_amount=new_cash_amount)
 

@@ -84,6 +84,12 @@ try:
         latest_hamsterwheel = sess.get_latest_hamsterwheel(mysql_connection=mysql_connection)
         # Read the latest decision
         latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
+        # Read the wallet
+        wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
+        # Update the decision options and get them
+        dec.update_decision_options(wallet=wallet)
+        decision_options = dec.get_decision_options()
+        next_decision_type = decision_options[BUY_SELL]
 
         # Check if the hamster is running. We use this trigger below.
         if is_hamster_running(latest_hamsterwheel=latest_hamsterwheel):
@@ -103,10 +109,10 @@ try:
                 )
                 latest_session = sess.get_latest_session(mysql_connection=mysql_connection)
                 latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
-                # Start also a new decision, the starting one is always buy/sell
+                # Start also a new decision, the starting one is always buy/sell unless the hamster is out of cash
                 _ = dec.start_new_decision(
                     mysql_connection=mysql_connection,
-                    next_decision_type=BUY_SELL,
+                    next_decision_type=next_decision_type,
                     session_id=latest_session.name,
                     latest_hamsterwheel_id=latest_hamsterwheel.name,
                     latest_decision=latest_decision
@@ -152,7 +158,7 @@ try:
                             latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
                             _ = dec.start_new_decision(
                                 mysql_connection=mysql_connection,
-                                next_decision_type=BUY_SELL,
+                                next_decision_type=next_decision_type,
                                 session_id=latest_session.name,
                                 latest_hamsterwheel_id=latest_hamsterwheel.name,
                                 latest_decision=latest_decision
@@ -325,7 +331,7 @@ try:
                     # Start also a new decision, the starting one is always buy/sell
                     _ = dec.start_new_decision(
                         mysql_connection=mysql_connection,
-                        next_decision_type=BUY_SELL,
+                        next_decision_type=next_decision_type,
                         session_id=latest_session.name,
                         latest_hamsterwheel_id=latest_hamsterwheel.name,
                         latest_decision=latest_decision
