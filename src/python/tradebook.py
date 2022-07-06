@@ -110,7 +110,7 @@ class Tradebook:
             # Cash amount to spend
             self._cash_amount = self._amount_percentage * cash
             # Amount the hamster can buy with that cash
-            self._ccy_amount = self._cash_amount * price
+            self._ccy_amount = self._cash_amount / price
 
         # if sell
         elif self._buy_sell_result == self._sell:
@@ -119,7 +119,7 @@ class Tradebook:
             # Calculate amount to sell
             self._ccy_amount = self._amount_percentage * available_funds
             # Calculate how much cash will be added by the sale
-            self._cash_amount = self._ccy_amount/price
+            self._cash_amount = self._ccy_amount * price
 
         else:
             # If neither, something went wrong

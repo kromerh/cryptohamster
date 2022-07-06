@@ -15,26 +15,6 @@ CREATE TABLE session(
     FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
 
-CREATE TABLE wallet(
-    wallet_id INT NOT NULL AUTO_INCREMENT,
-    currency_symbol VARCHAR(50) NOT NULL,
-    amount FLOAT NOT NULL,
-    PRIMARY KEY ( wallet_id )
-);
-
-CREATE TABLE tradebook(
-    tradebook_id INT NOT NULL AUTO_INCREMENT,
-    session_id INT,
-    buy_sell VARCHAR(50) NOT NULL,
-    currency_symbol VARCHAR(50) NOT NULL,
-    cash_amount FLOAT NOT NULL,
-    ccy_amount FLOAT NOT NULL,
-    ccy_price FLOAT NOT NULL,
-    time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY ( tradebook_id ),
-    FOREIGN KEY ( session_id ) REFERENCES session( session_id )
-);
-
 CREATE TABLE decision(
     decision_id INT NOT NULL AUTO_INCREMENT,
     session_id INT,
@@ -50,6 +30,38 @@ CREATE TABLE decision(
     FOREIGN KEY ( hamsterwheel_id_start ) REFERENCES hamsterwheel( hamsterwheel_id ),
     FOREIGN KEY ( hamsterwheel_id_end ) REFERENCES hamsterwheel( hamsterwheel_id )
 );
+
+CREATE TABLE wallet(
+    wallet_id INT NOT NULL AUTO_INCREMENT,
+    currency_symbol VARCHAR(50) NOT NULL,
+    amount FLOAT NOT NULL,
+    PRIMARY KEY ( wallet_id )
+);
+
+CREATE TABLE tradebook(
+    tradebook_id INT NOT NULL AUTO_INCREMENT,
+    session_id INT NOT NULL,
+    decision_cycle INT NOT NULL,
+    buy_sell VARCHAR(50) NOT NULL,
+    currency_symbol VARCHAR(50) NOT NULL,
+    cash_amount FLOAT NOT NULL,
+    ccy_amount FLOAT NOT NULL,
+    ccy_price FLOAT NOT NULL,
+    time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY ( tradebook_id ),
+    FOREIGN KEY ( session_id ) REFERENCES session( session_id )
+);
+
+-- Give the hamster 10k USD to start
+INSERT INTO wallet (currency_symbol, amount) VALUES ("CASH", 10000.0);
+
+
+
+
+
+
+
+
 
 
 CREATE TABLE TEST_hamsterwheel(
@@ -108,6 +120,3 @@ CREATE TABLE TEST_decision(
 
 -- Give the hamster 10k USD to start
 INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("CASH", 10000.0);
-INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("btc", 999.0);
-INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("eth", 888.0);
-INSERT INTO TEST_wallet (currency_symbol, amount) VALUES ("wilson", 777.0);

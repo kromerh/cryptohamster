@@ -204,13 +204,15 @@ class Decision():
         self,
         wallet: Dict[str, float],
         latest_decision: pd.core.series.Series,
-        num_wheelturns: int
+        num_wheelturns: int,
+        mysql_connection: pymysql.connections.Connection = None,
         ) -> str:
         """Method to make a decision given the number of wheel_counts and the current decision mode.
 
         Args:
             latest_decision: Latest decision row.
             num_wheelturns: Number of wheelturns in the decision cycle.
+            mysql_connection: MySQL connection.
 
         Returns:
             Decision outcome.
@@ -220,7 +222,18 @@ class Decision():
         current_decision = latest_decision[type_col]
 
         # Update the decision options
-        self.update_decision_options(wallet=wallet, get_currencies=True)
+        # If it is currency decision, we need to select different sets based
+        # on the result of the buy or sell decision
+        if current_decision == CURRENCY:
+            get_currencies = True
+        else:
+            get_currencies = False
+        self.update_decision_options(
+            wallet=wallet,
+            latest_decision=latest_decision,
+            get_currencies=get_currencies,
+            mysql_connection=mysql_connection,
+        )
 
         # Lookup the list of possible decision from the dictionary
         decision_list = self._decision_options[current_decision]
@@ -374,7 +387,6 @@ class Decision():
             decision_cycle = 1
         else:      
             if next_decision_type == BUY_SELL:  
-                # Check if the hamster holds cash to buy
                 # If buy or sell, increase the decision cycle by one
                 decision_cycle = int(latest_decision[decision_cycle_col]) + 1
             else:
@@ -456,28 +468,40 @@ class Decision():
     def update_decision_options(
         self,
         wallet: Dict[str, float],
-        get_currencies: bool = False
+        get_currencies: bool = False,
+        latest_decision: pd.core.series.Series = None,
+        mysql_connection: pymysql.connections.Connection = None,
     ) -> None:
         """Method to get the decision options.
 
         Args:
             wallet: Wallet of the hamster.
+            latest_decision: Latest decision.
             get_currencies: Flag to control to also retrieve currencies from Binance to buy.
+            mysql_connection: MySQL connection.
         
         Returns:
             Dictionary with the decision options.
         """
         # Currencies the hamster holds
-        currencies = list(wallet.keys())
-        currencies.remove(CASH)
-
-        # Cash amount the hamster holds
-        cash = wallet[CASH]
+        hamsters_currencies = list(wallet.keys())
+        if CASH in hamsters_currencies:
+            hamsters_currencies.remove(CASH)
+            # Cash amount the hamster holds
+            cash = wallet[CASH]
+        else:
+            cash = 0.0
 
         # BUY_SELL
         # If the hamster has no currencies, we can only buy
-        if len(currencies) == 0:
+        if len(hamsters_currencies) == 0:
             if cash > 0:
+                logmsg = f'Hamster holds no currencies, can only buy.'
+                log(
+                    log_path=CRYPTOHAMSTER_LOG_FILE_PATH,
+                    logmsg=logmsg,
+                    printout=PRINTOUT
+                )
                 self._decision_options[BUY_SELL] = [BUY]
             # Hamster is broke
             else:
@@ -503,9 +527,55 @@ class Decision():
         
         # CURRENCY
         if get_currencies:
+            # Get the result of the buy_sell decision
+            buy_sell_result = self.get_buy_sell_result(
+                latest_decision=latest_decision,
+                mysql_connection=mysql_connection
+            )
+            # If buy, we want the currencies from binance
+            # If sell, we want the currencies from the wallet
             # Retrieve the list of available currencies from binance
-            currencies = Binance().get_available_currencies()
+            currencies = Binance().get_available_currencies(
+                buy_sell_decision=buy_sell_result,
+                hamsters_currencies=hamsters_currencies
+            )
             self._decision_options[CURRENCY] = currencies
+
+    def get_buy_sell_result(
+        self,
+        latest_decision: pd.core.series.Series,
+        mysql_connection: pymysql.connections.Connection,
+    ) -> str:
+        """Method to return the result from the buy/sell of this decision cycle.
+
+        Args:
+            latest_decision: Latest decision.
+
+        Returns:
+            Latest result of buy_sell, either BUY or SELL.
+        """
+        table = self._db_tbl['DECISION']['name']
+        decision_cycle_col = self._db_tbl['DECISION']['decision_cycle_col']
+        result_col = self._db_tbl['DECISION']['result_col']
+        type_col = self._db_tbl['DECISION']['type_col']
+        id_col = self._db_tbl['DECISION']['id_col']
+
+        decision_cycle = latest_decision[decision_cycle_col]
+        # Get the buy_sell result of that decision cycle
+        qry = f'SELECT * FROM {table} ' +\
+            f'WHERE {decision_cycle_col} = {decision_cycle} ' +\
+            f'AND {type_col} = \"{BUY_SELL}\"'
+        df = pd.read_sql(
+            sql=qry,
+            con=mysql_connection,
+            index_col=id_col
+        )
+        result = df[result_col].values[0]
+
+        return result
+
+
+
 
     def get_decision_options(self) -> Dict[str, List[Any]]:
         """Method to return the decision options.

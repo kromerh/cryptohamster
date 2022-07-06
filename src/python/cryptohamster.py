@@ -88,8 +88,6 @@ try:
         wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
         # Update the decision options and get them
         dec.update_decision_options(wallet=wallet)
-        decision_options = dec.get_decision_options()
-        next_decision_type = decision_options[BUY_SELL]
 
         # Check if the hamster is running. We use this trigger below.
         if is_hamster_running(latest_hamsterwheel=latest_hamsterwheel):
@@ -158,7 +156,7 @@ try:
                             latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
                             _ = dec.start_new_decision(
                                 mysql_connection=mysql_connection,
-                                next_decision_type=next_decision_type,
+                                next_decision_type=BUY_SELL,
                                 session_id=latest_session.name,
                                 latest_hamsterwheel_id=latest_hamsterwheel.name,
                                 latest_decision=latest_decision
@@ -213,7 +211,8 @@ try:
                                     result = dec.determine_decision(
                                         latest_decision=latest_decision,
                                         num_wheelturns=num_wheelturns,
-                                        wallet=wallet
+                                        wallet=wallet,
+                                        mysql_connection=mysql_connection
                                     )
                                     dec.update_decision_closed(
                                         mysql_connection=mysql_connection,
@@ -294,8 +293,9 @@ try:
                             # Check if the hamster is running
                             if main_trigger:
                                 # Get the next decision
-                                next_decision = dec.get_next_decision(latest_decision=latest_decision)
                                 latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
+                                next_decision = dec.get_next_decision(latest_decision=latest_decision)
+                                
                                 # Start a new decision
                                 _ = dec.start_new_decision(
                                     mysql_connection=mysql_connection,
@@ -328,10 +328,14 @@ try:
                     )
                     latest_session = sess.get_latest_session(mysql_connection=mysql_connection)
                     latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
+                    # Read the wallet
+                    wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
+                    # Update the decision options and get them
+                    dec.update_decision_options(wallet=wallet)
                     # Start also a new decision, the starting one is always buy/sell
                     _ = dec.start_new_decision(
                         mysql_connection=mysql_connection,
-                        next_decision_type=next_decision_type,
+                        next_decision_type=BUY_SELL,
                         session_id=latest_session.name,
                         latest_hamsterwheel_id=latest_hamsterwheel.name,
                         latest_decision=latest_decision
