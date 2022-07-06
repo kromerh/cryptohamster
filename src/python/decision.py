@@ -1,5 +1,4 @@
 from datetime import datetime
-from subprocess import IDLE_PRIORITY_CLASS
 import numpy as np
 import pymysql
 import pandas as pd
