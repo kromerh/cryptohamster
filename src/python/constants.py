@@ -22,16 +22,19 @@ HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 # Log file for the handler script script
 HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
 # Log file for the decision class
-CRYPTOHAMSTER_LOG_FILE_PATH = f'{HOME}/log/cryptohamster.log'
 if remote:
     CRYPTOHAMSTER_LOG_FILE_PATH = f'./log/cryptohamster.log'
+else:
+    CRYPTOHAMSTER_LOG_FILE_PATH = f'{HOME}/log/cryptohamster.log'
 
 # Database
 
 # Database connection strings
 DATABASE = 'cryptohamster'
-HOST_LOCAL = 'localhost'  # On the RPi local
-HOST_REMOTE = '192.168.1.105'  # Sometimes does not work: then use 192.168.1.105
+if remote:
+    HOST = '192.168.1.105'
+else:
+    HOST = 'localhost'  # On the RPi local
 PORT = 3306
 FULL_PATH_TO_CREDENTIALS = f'{HOME}/credentials.cred'
 # For execution on another host

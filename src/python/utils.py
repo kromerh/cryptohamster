@@ -6,7 +6,7 @@ import os
 
 from constants import (
     FULL_PATH_TO_CREDENTIALS,
-    HOST_REMOTE,
+    HOST,
     DATABASE,
     PORT
 )
@@ -87,7 +87,7 @@ def get_latest_row_by_id(
 
 def create_mysql_connection(
     full_path_to_credentials: str = FULL_PATH_TO_CREDENTIALS,
-    host: str = HOST_REMOTE,
+    host: str = HOST,
     db: str = DATABASE,
     port: int = PORT
     ) -> pymysql.connections.Connection:

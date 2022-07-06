@@ -12,7 +12,7 @@ from constants import (
     DATABASE,
     FULL_PATH_TO_CREDENTIALS,
     HAMSTERWHEEL_LOG_FILE_PATH,
-    HOST_LOCAL,
+    HOST,
     PORT,
     TABLE_HAMSTERWHEEL,
 )
@@ -24,7 +24,7 @@ try:
     conn = mariadb.connect(
         user=user,
         password=password,
-        host=HOST_LOCAL,
+        host=HOST,
         port=PORT,
         database=DATABASE
     )
