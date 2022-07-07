@@ -107,10 +107,14 @@ try:
                 )
                 latest_session = sess.get_latest_session(mysql_connection=mysql_connection)
                 latest_decision = dec.get_latest_decision(mysql_connection=mysql_connection)
+                # Read the wallet
+                wallet = Wallet().get_wallet(mysql_connection=mysql_connection)
+                # Update the decision options and get them
+                dec.update_decision_options(wallet=wallet)
                 # Start also a new decision, the starting one is always buy/sell unless the hamster is out of cash
                 _ = dec.start_new_decision(
                     mysql_connection=mysql_connection,
-                    next_decision_type=next_decision_type,
+                    next_decision_type=BUY_SELL,
                     session_id=latest_session.name,
                     latest_hamsterwheel_id=latest_hamsterwheel.name,
                     latest_decision=latest_decision
