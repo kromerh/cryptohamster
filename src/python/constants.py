@@ -1,9 +1,9 @@
 import numpy as np
 
 # Control if script is executed on a RPi or remote
-remote = True # Set to False if run on RPi
+remote = False # Set to False if run on RPi
 # Control if test tables or real tables should be used
-test = True # Set to False during real run
+test = False # Set to False during real run
 
 # RPi paths
 
@@ -14,13 +14,16 @@ BASH = 'src/bash'
 # Location of the .sh file on the RPi (copied from this repo)
 FILENAME_RUN_HAMSTERWHEEL = 'run_hamsterwheel.sh'
 HAMSTERWHEEL_PATH = f'{HOME}/{REPO}/{BASH}/{FILENAME_RUN_HAMSTERWHEEL}'
+FILENAME_RUN_CRYPTOHAMSTER = 'run_cryptohamster.sh'
+CRYPTOHAMSTER_PATH = f'{HOME}/{REPO}/{BASH}/{FILENAME_RUN_CRYPTOHAMSTER}'
 
 # Log files
 PRINTOUT = True
 # Log file for the hamsterwheel sensor code
 HAMSTERWHEEL_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel.log'
 # Log file for the handler script script
-HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
+HAMSTERWHEEL_HANDLER_LOG_FILE_PATH = f'{HOME}/log/hamsterwheel_handler.log'
+CRYPTOHAMSTER_HANDLER_LOG_FILE_PATH = f'{HOME}/log/cryptohamster_handler.log'
 # Log file for the decision class
 if remote:
     CRYPTOHAMSTER_LOG_FILE_PATH = f'./log/cryptohamster.log'

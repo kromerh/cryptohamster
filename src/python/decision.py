@@ -239,7 +239,8 @@ class Decision():
 
         # Make the decision using the number of wheelturns
         # Remove 1 turn to account for the 0th wheel turn
-        num_wheelturns = num_wheelturns - 1
+        if num_wheelturns > 0:
+            num_wheelturns = num_wheelturns - 1
         # Repeat the decision list enough times to fit the wheelturn in
         # Add 1 for safety
         multiplier = int(np.ceil(num_wheelturns/len(decision_list))) + 1
