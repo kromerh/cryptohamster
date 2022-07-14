@@ -1,5 +1,5 @@
 import RPi.GPIO as io
-import mariadb
+import pymysql
 import sys
 import time
 
@@ -21,15 +21,16 @@ user, password = load_credentials(filepath=FULL_PATH_TO_CREDENTIALS)
 
 # Connect to MariaDB Platform
 try:
-    conn = mariadb.connect(
+    conn = pymysql.connect(
+        host=HOST,
         user=user,
         password=password,
-        host=HOST,
+        db=DATABASE,
         port=PORT,
-        database=DATABASE
+        charset='utf8'
     )
-except mariadb.Error as e:
-    msg = f"Error connecting to MariaDB Platform: {e}"
+except:
+    msg = f"Error connecting to MariaDB server"
     log(log_path=HAMSTERWHEEL_LOG_FILE_PATH, logmsg=msg, printout=True)
     sys.exit(1)
 
