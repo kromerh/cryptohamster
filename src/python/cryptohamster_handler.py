@@ -11,14 +11,14 @@ from constants import (
 )
 
 # Check if the log file is populating for the hamsterwheel script. If it i
-# Get file size, wait two seconds, get the file size again, and a third time
+# Get file size, wait three seconds, get the file size again, and a third time
 file_size_1 = os.stat(CRYPTOHAMSTER_LOG_FILE_PATH).st_size
-# Wait for 2 seconds
-time.sleep(2)
+# Wait for 3 seconds
+time.sleep(3)
 # Get new file size
 file_size_2 = os.stat(CRYPTOHAMSTER_LOG_FILE_PATH).st_size
-# Wait for 2 seconds
-time.sleep(2)
+# Wait for 3 seconds
+time.sleep(3)
 # Get new file size
 file_size_3 = os.stat(CRYPTOHAMSTER_LOG_FILE_PATH).st_size
 
