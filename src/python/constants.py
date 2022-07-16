@@ -3,7 +3,7 @@ import numpy as np
 # Control if script is executed on a RPi or remote
 remote = False # Set to False if run on RPi
 # Control if test tables or real tables should be used
-test = False # Set to False during real run
+test = True # Set to False during real run
 
 # RPi paths
 
