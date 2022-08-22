@@ -8,7 +8,7 @@ myMQTTClient.configureEndpoint("a72qba275aic3-ats.iot.eu-central-1.amazonaws.com
 myMQTTClient.configureCredentials(
     CAFilePath="/home/wilson/aws_iot/AmazonRootCA1.pem",
     KeyPath="/home/wilson/aws_iot/iot-private.pem.key",
-    CertificatePath="/home/wilson/aws_iot/iot.pem.key",
+    CertificatePath="/home/wilson/aws_iot/iot.pem.crt",
 )
  
 print('Initiating Realtime Data Transfer From Raspberry Pi...')
