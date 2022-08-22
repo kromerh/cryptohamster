@@ -24,12 +24,12 @@ io.setup(wheelpin, io.IN, pull_up_down=io.PUD_UP)
 
 logger.info('Initiating Realtime Data Transfer From Raspberry Pi...')
 Myvar= myMQTTClient.connect()
-date = datetime.now().strftime("%Y%m%d %I:%M:%S")
+date = datetime.now().strftime("%Y-%m-%d %I:%M:%S")
 logger.info(f"Starting logging. Timestamp: {date}.")
 
 
 while True:
-    date = datetime.now().strftime("%Y%m%d %I:%M:%S")
+    date = datetime.now().strftime("%Y-%m-%d %I:%M:%S")
     if (io.input(wheelpin) == 0):
         message = "Magnet closed."
         myMQTTClient.publish(
