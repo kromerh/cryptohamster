@@ -35,13 +35,13 @@ while True:
         myMQTTClient.publish(
             "topic/pi",
             "{\"Timestamp\" :\""+ str(date) +
-            "\", \"WheelPin\":\""+ {wheelpin} + "\"}", 0)
+            "\", \"WheelPin\":\""+ str(wheelpin) + "\"}", 0)
         logger.info(f'Published message {message}. Timestamp: {date}.')
     else:
         message = "Magnet open."
         myMQTTClient.publish(
             "topic/pi",
             "{\"Timestamp\" :\""+ str(date) +
-            "\", \"WheelPin\":\""+ {wheelpin} + "\"}", 0)
+            "\", \"WheelPin\":\""+ str(wheelpin) + "\"}", 0)
         logger.info(f'Published message {message}. Timestamp: {date}.')
     time.sleep(1)
