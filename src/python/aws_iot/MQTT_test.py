@@ -3,7 +3,7 @@ import time
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 myMQTTClient = AWSIoTMQTTClient("test_client")
-myMQTTClient.configureEndpoint("xxxxxxxxx.iot.yourregion.amazonaws.coma72qba275aic3-ats.iot.eu-central-1.amazonaws.com", 8883)
+myMQTTClient.configureEndpoint("a72qba275aic3-ats.iot.eu-central-1.amazonaws.com", 8883)
 
 myMQTTClient.configureCredentials(
     "/home/wilson/aws_iot/AmazonRootCA1.pem",
