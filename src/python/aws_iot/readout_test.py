@@ -5,7 +5,7 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import logging
 
 logger = logging.getLogger()
-logging.basicconfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 myMQTTClient = AWSIoTMQTTClient("test_client")
 myMQTTClient.configureEndpoint("a72qba275aic3-ats.iot.eu-central-1.amazonaws.com", 8883)
