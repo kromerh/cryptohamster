@@ -79,9 +79,8 @@ def update_raw_hamsterwheel(
     for index, row in df.iterrows():
         time = row["time"]
         magnet = row["magnet"]
-        query = (
-            f'INSERT INTO raw_hamsterwheel (time, magnet) VALUES ("{time}", "{magnet}")'
-        )
+        hash = row["hash"]
+        query = f"INSERT INTO raw_hamsterwheel (hash, time, magnet) VALUES ('{hash}', '{time}', {magnet})"
         cursor.execute(query)
         mysql_connection.commit()
 
