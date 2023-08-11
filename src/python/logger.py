@@ -122,9 +122,13 @@ def get_filename() -> str:
     return log_path_fname
 
 
-def add_hash_column(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
+def add_hash_column(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     """Add hash column to df based on columns."""
-    df["hash"] = df[columns].apply(lambda x: hashlib.md5(x).hexdigest(), axis=1)
+    df["hash"] = (
+        df[columns]
+        .astype(str)
+        .apply(lambda x: hashlib.md5(x.to_string().encode()).hexdigest(), axis=1)
+    )
     return df
 
 
