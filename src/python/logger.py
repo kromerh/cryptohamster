@@ -135,7 +135,7 @@ if __name__ == "__main__":
     try:
         file_name = get_filename()
         while True:
-            loglines = read_last_n_lines(file_name=file_name, n=5)
+            loglines = read_last_n_lines(file_name=file_name, n=20)
             dates = []
             magnets = []
             for line in loglines:
