@@ -168,10 +168,12 @@ if __name__ == "__main__":
                 update_raw_hamsterwheel(
                     cursor=cursor, mysql_connection=mysql_connection, df=df
                 )
-            time.sleep(0.1)
+            mysql_connection.close()
+            time.sleep(0.5)
     except KeyboardInterrupt:
         print("Exiting")
         mysql_connection.close()
         sys.exit(0)
     except Exception as e:
         logger.error(f"Error: {e}")
+        mysql_connection.close()
