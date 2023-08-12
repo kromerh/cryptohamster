@@ -7,6 +7,19 @@ import pandas as pd
 import warnings
 from datetime import datetime
 import hashlib
+import logging
+
+logging.basicConfig(
+    filename=f"/home/done4/log_logger.log",
+    filemode="a",
+    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+    level=logging.info,
+)
+
+logging.info("Running Loggern")
+
+logger = logging.getLogger()
 
 warnings.simplefilter(action="ignore", category=UserWarning)
 # def follow(thefile: str) -> Generator[str, None, None]:
@@ -55,20 +68,6 @@ def check_line(line: str) -> bool:
         return False
 
     return True
-
-
-# Create mysql connection
-mysql_connection = pymysql.connect(
-    host="192.168.1.121",
-    user="tiberius",
-    password="q123",
-    db="cryptohamster",
-    port=3306,
-    charset="utf8",
-)
-
-# Get Cursor
-cursor = mysql_connection.cursor()
 
 
 def update_raw_hamsterwheel(
@@ -135,6 +134,18 @@ if __name__ == "__main__":
     try:
         file_name = get_filename()
         while True:
+            # Create mysql connection
+            mysql_connection = pymysql.connect(
+                host="192.168.1.121",
+                user="tiberius",
+                password="q123",
+                db="cryptohamster",
+                port=3306,
+                charset="utf8",
+            )
+
+            # Get Cursor
+            cursor = mysql_connection.cursor()
             loglines = read_last_n_lines(file_name=file_name, n=20)
             dates = []
             magnets = []
@@ -153,11 +164,14 @@ if __name__ == "__main__":
             )
             df = remove_rows(df_1=df_new, df_2=df_read, compare_col="hash")
             if len(df) > 0:
+                logger.info(f"Saving to DB new rows: {len(df)}")
                 update_raw_hamsterwheel(
                     cursor=cursor, mysql_connection=mysql_connection, df=df
                 )
-            time.sleep(2)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         print("Exiting")
         mysql_connection.close()
         sys.exit(0)
+    except Exception as e:
+        logger.error(f"Error: {e}")
