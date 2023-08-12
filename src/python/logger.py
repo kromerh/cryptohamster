@@ -160,7 +160,7 @@ if __name__ == "__main__":
             df_new = create_df_from_log(dates=dates, magnets=magnets)
             df_new = add_hash_column(df=df_new, columns=["time", "magnet"])
             df_read = read_last_n_rows_from_raw_hamsterwheel(
-                mysql_connection=mysql_connection, n=5
+                mysql_connection=mysql_connection, n=20
             )
             df = remove_rows(df_1=df_new, df_2=df_read, compare_col="hash")
             if len(df) > 0:
