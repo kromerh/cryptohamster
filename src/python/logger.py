@@ -131,9 +131,9 @@ def add_hash_column(df: pd.DataFrame, columns: list) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    try:
-        file_name = get_filename()
-        while True:
+    while True:
+        try:
+            file_name = get_filename()
             # Create mysql connection
             mysql_connection = pymysql.connect(
                 host="192.168.1.121",
@@ -169,11 +169,12 @@ if __name__ == "__main__":
                     cursor=cursor, mysql_connection=mysql_connection, df=df
                 )
             mysql_connection.close()
-            time.sleep(0.5)
-    except KeyboardInterrupt:
-        print("Exiting")
-        mysql_connection.close()
-        sys.exit(0)
-    except Exception as e:
-        logger.error(f"Error: {e}")
-        mysql_connection.close()
+            time.sleep(1)
+        except KeyboardInterrupt:
+            print("Exiting")
+            mysql_connection.close()
+            sys.exit(0)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            mysql_connection.close()
+            continue
