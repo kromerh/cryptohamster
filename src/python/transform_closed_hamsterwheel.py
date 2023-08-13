@@ -105,7 +105,7 @@ if __name__ == "__main__":
             cursor=mysql_connection.cursor(),
             minutes=3,
         )
-
+        mysql_connection.commit()
         mysql_connection.close()
     except Exception as e:
         logger.error(f"Error connecting to MySQL: {e}")
