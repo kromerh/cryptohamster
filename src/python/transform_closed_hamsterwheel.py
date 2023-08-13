@@ -78,12 +78,12 @@ if __name__ == "__main__":
         logger.info(
             f"Read {len(df_closed_hamsterwheel)} rows from closed_hamsterwheel."
         )
-        # Filter on closed
-        df_closed_hamsterwheel = filter_on_closed(df=df_closed_hamsterwheel)
         # Read everything from raw_hamsterwheel from last 2 min
         df_raw_hamsterwheel = read_last_mins_from_table(
             mysql_connection=mysql_connection, table="raw_hamsterwheel", minutes=2
         )
+        # Filter on closed
+        df_raw_hamsterwheel = filter_on_closed(df=df_raw_hamsterwheel)
         logger.info(f"Read {len(df_raw_hamsterwheel)} rows from raw_hamsterwheel.")
         # Remove rows from raw_hamsterwheel that are already in closed_hamsterwheel
         df_raw_hamsterwheel = remove_rows(
