@@ -17,19 +17,11 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-logging.info("Running Loggern")
+logging.info("Running Logger")
 
 logger = logging.getLogger()
 
 warnings.simplefilter(action="ignore", category=UserWarning)
-# def follow(thefile: str) -> Generator[str, None, None]:
-#     thefile.seek(0, 2)  # Go to the end of the file
-#     while True:
-#         line = thefile.readline()
-#         if not line:
-#             time.sleep(0.1)  # Sleep briefly
-#             continue
-#         yield line
 
 
 def read_last_n_lines(file_name: str, n: int) -> list:

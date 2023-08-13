@@ -5,6 +5,13 @@ CREATE TABLE raw_hamsterwheel(
     PRIMARY KEY ( id )
 );
 
+CREATE TABLE closed_hamsterwheel(
+    id INT NOT NULL AUTO_INCREMENT,
+    time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    magnet TINYINT(1) NOT NULL,
+    PRIMARY KEY ( id )
+);
+
 CREATE TABLE latest_hamsterwheel(
     id INT NOT NULL AUTO_INCREMENT,
     time TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
