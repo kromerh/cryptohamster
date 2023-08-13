@@ -80,7 +80,7 @@ if __name__ == "__main__":
         )
         # Read everything from raw_hamsterwheel from last 2 min
         df_raw_hamsterwheel = read_last_mins_from_table(
-            mysql_connection=mysql_connection, table="raw_hamsterwheel", minutes=2
+            mysql_connection=mysql_connection, table="raw_hamsterwheel", minutes=10
         )
         # Filter on closed
         df_raw_hamsterwheel = filter_on_closed(df=df_raw_hamsterwheel)
@@ -103,7 +103,7 @@ if __name__ == "__main__":
         # Delete rows from raw_hamsterwheel
         delete_rows_raw_hamsterwheel(
             cursor=mysql_connection.cursor(),
-            minutes=3,
+            minutes=15,
         )
         mysql_connection.commit()
         mysql_connection.close()
